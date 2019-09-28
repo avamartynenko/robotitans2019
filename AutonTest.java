@@ -98,23 +98,37 @@ public class AutonTest extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-            robot.linearMove(robot.FORWARD, 0.5, 18);
+            robot.linearMove(robot.FORWARD, 0.4, 18);
 
-            sleep(10000);
+            sleep(5000);
 
-            robot.linearMove(robot.RIGHT, 0.5, 58);
+            telemetry.addData("Path", "went forward");
+            telemetry.update();
 
-            sleep(10000);
+            robot.linearMove(robot.RIGHT, 0.4, 73);
 
-            robot.linearMove(robot.FORWARD, 0.5, 15);
+            sleep(5000);
 
-            sleep(10000);
+            telemetry.addData("Path", "strafed right");
+            telemetry.update();
 
-            robot.linearMove(robot.REVERSE, 0.5, 15);
+            //robot.linearMove(robot.FORWARD, 0.4, 15);
 
-            sleep(10000);
+            //sleep(10000);
 
-            robot.linearMove(robot.LEFT, 0.5, 22);
+            robot.linearMove(robot.REVERSE, 0.4, 15);
+
+            sleep(5000);
+
+            telemetry.addData("Path", "went back");
+            telemetry.update();
+
+            robot.linearMove(robot.LEFT, 0.4, 46);
+
+            sleep(5000);
+
+            telemetry.addData("Path", "went left");
+            telemetry.update();
 
 
 
