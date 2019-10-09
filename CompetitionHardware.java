@@ -70,9 +70,13 @@ public class CompetitionHardware
     public DcMotor backLeft = null;
     public DcMotor backRight = null;
     public ColorSensor colorsense = null;
+    public boolean hasHook = true;
     public boolean hasArm = true;
-    public boolean hasSlideRail = true;
     public boolean activateSpeedProfile = false;
+    public Hooks hookLatch = null;
+    public Arm frontArm = null;
+    public Arm backArm = null;
+
 
 
     public static final double     COUNTS_PER_MOTOR_REV    = 2240 ;    // eg: TETRIX Motor Encoder
@@ -126,6 +130,9 @@ public class CompetitionHardware
         frontRight = hwMap.get(DcMotor.class, "frontRight");
         frontLeft = hwMap.get(DcMotor.class, "frontLeft");
 
+        if (hasHook) hookLatch = new Hooks(hwMap);
+        if (hasArm) frontArm = new Arm(hwMap,"Front");
+        if (hasArm) backArm = new Arm(hwMap,"Back");
 
 
 
