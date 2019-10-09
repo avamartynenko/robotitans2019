@@ -99,20 +99,12 @@ public class ServoTest extends LinearOpMode {
 
 
             //testHooks();
-            //sleep(50000);
-            testArm(robot.frontArm);
+            //sleep(10000);
+            //testArm(robot.frontArm);
+            //testArm2(robot.backArm);
 
 
-            /*robot.hookLatch.hookLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-            robot.hookLatch.hookRight.setDirection(DcMotorSimple.Direction.REVERSE);
-            telemetry.addData("Path 3",robot.hookLatch.hookLeft.getDirection());
-            robot.hookLatch.hookLeft.setPower(0.075);
-            robot.hookLatch.hookRight.setPower(0.075);
-            sleep(3000);
 
-*/
-
-/*
             robot.hookLatch.latch();
             telemetry.addData("Path", "latched");
             telemetry.update();
@@ -132,7 +124,7 @@ public class ServoTest extends LinearOpMode {
             sleep(1000);
             telemetry.addData("Path", "completeRelease");
 
-*/
+
 
 
 
@@ -211,6 +203,31 @@ public class ServoTest extends LinearOpMode {
     }
 
 
+
+
+    public void testArm2(Arm armToTest){
+
+        armToTest.dropServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        telemetry.addData("Path 1",armToTest.dropServo.getDirection());
+        armToTest.dropServo.setPower(0.1);
+        sleep(3000);
+
+        armToTest.dropServo.setPower(0);
+        sleep(1000);
+
+        armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        telemetry.addData("Path 2",armToTest.collectServo.getDirection());
+        armToTest.collectServo.setPower(0.5);
+        sleep(3000);
+
+        armToTest.dropServo.setDirection(DcMotorSimple.Direction.REVERSE);
+        telemetry.addData("Path 3",armToTest.dropServo.getDirection());
+        armToTest.dropServo.setPower(0.1);
+        sleep(5-000);
+
+        robot.linearMove(robot.LEFT,0.45,35);
+
+    }
 
 
 
