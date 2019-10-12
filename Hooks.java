@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class Hooks extends LinearOpMode {
+public class Hooks {
 
     CRServo hookRight;
     CRServo hookLeft;
@@ -15,10 +14,6 @@ public class Hooks extends LinearOpMode {
     public double LATCH_SPEED = 0.1;
     public double STOP_SPEED = 0.0;
 
-    @Override
-    public void runOpMode() {
-
-    }
 
     public Hooks(HardwareMap parentHwMap){
 
@@ -73,7 +68,7 @@ public class Hooks extends LinearOpMode {
         run(LATCH_SPEED);
     }
 
-    public void completeRelease(){
+    public void stop(){
 
         run(0);
     }
