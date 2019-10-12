@@ -89,6 +89,9 @@ public class AutonTest extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+        // refresh competition hardware, arm. hook
+        // code is in servotest class
+
         /*
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
@@ -103,7 +106,7 @@ public class AutonTest extends LinearOpMode {
 
         if (opModeIsActive())
         {
-            // get cube
+/*            // get cube
             linearMoveWrapper(robot.FORWARD, 27, true); // runinto the wall
             linearMoveWrapper(robot.RIGHT, 27, false);
 
@@ -111,8 +114,8 @@ public class AutonTest extends LinearOpMode {
 
             // place cube
             linearMoveWrapper(robot.LEFT, 28, true);
-            linearMoveWrapper(robot.REVERSE, 115, true);
-            sleep(100);
+            linearMoveWrapper(robot.REVERSE, 120, true);
+            sleep(100);*/
 
             linearMoveWrapper(robot.RIGHT, 29, false);
             linearMoveWrapper(robot.FORWARD,10, false);
@@ -126,8 +129,13 @@ public class AutonTest extends LinearOpMode {
 
             // TODO: put grab platform code here
 
+            Hooks rbHooks = new Hooks(hardwareMap);
+            rbHooks.latch();
+
             // pull platform back
             linearMoveWrapper(robot.FORWARD, 32, false);
+
+            rbHooks.release();
 
             // push platform to the corner
             linearMoveWrapper(robot.RIGHT, 27, false);
