@@ -80,7 +80,7 @@ public class AutonTest extends LinearOpMode {
     static final double WALL_OVERRUN = 1; // home much father we run into the wall
     static final double WALL_RECOIL = .5; // how far we pull back from the wall
     static final double START_SPEED = .5; // highest possible speed with no slippage
-    static final double MAX_SPEED = 1;
+    static final double MAX_SPEED = .5;
 
     @Override
     public void runOpMode() {
@@ -113,35 +113,42 @@ public class AutonTest extends LinearOpMode {
             linearMoveWrapper(robot.REVERSE, 120, true);
             sleep(100);*/
 
-            linearMoveWrapper(robot.RIGHT, 29, false);
-            linearMoveWrapper(robot.FORWARD,10, false);
-
+           // linearMoveWrapper(robot.RIGHT, 29, false);
+            robot.linearMove(robot.RIGHT, MAX_SPEED*0.75, 31);
+            //linearMoveWrapper(robot.FORWARD,10, false);
+            robot.linearMove(robot.FORWARD, MAX_SPEED*0.75, 12);
             // TODO: put place cube code here
 
             // pullback and rotate
-            linearMoveWrapper(robot.LEFT, 4, false);
-            robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
-            linearMoveWrapper(robot.REVERSE, 4, false);
-
+            //linearMoveWrapper(robot.LEFT, 4, false);
+            robot.linearMove(robot.LEFT, MAX_SPEED*0.5, 4);
+            //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
+            robot.gyroMove(robot.GYRO_LEFT, MAX_SPEED*0.75,85);
+            //linearMoveWrapper(robot.REVERSE, 4, false);
+            robot.linearMove(robot.REVERSE, MAX_SPEED*0.25, 4);
             // TODO: put grab platform code here
 
             Hooks rbHooks = new Hooks(hardwareMap);
             rbHooks.latch();
+            sleep(3000);
 
             // pull platform back
-            linearMoveWrapper(robot.FORWARD, 32, false);
+            //linearMoveWrapper(robot.FORWARD, 32, false);
+            robot.linearMove(robot.FORWARD, MAX_SPEED*0.75, 35);
 
             rbHooks.release();
+            sleep(3000);
+            rbHooks.stop();
 
             // push platform to the corner
-            linearMoveWrapper(robot.RIGHT, 27, false);
+            linearMoveWrapper(robot.RIGHT, 32, false);
             linearMoveWrapper(robot.REVERSE, 19, false);
             linearMoveWrapper(robot.LEFT, 6, true);
 
             // retreat and park under the bridge
 
             linearMoveWrapper(robot.FORWARD, 19, true);
-            linearMoveWrapper(robot.RIGHT, 26, false);
+            linearMoveWrapper(robot.RIGHT, 23, false);
 /*
 
             robot.linearMove(robot.FORWARD, 0.4, 18);
