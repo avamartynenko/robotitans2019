@@ -131,8 +131,8 @@ public class CompetitionHardware
         frontLeft = hwMap.get(DcMotor.class, "frontLeft");
 
         if (hasHook) hookLatch = new Hooks(hwMap);
-        if (hasArm) frontArm = new Arm(hwMap,"Front");
-        if (hasArm) backArm = new Arm(hwMap,"Back");
+        if (hasArm) frontArm = new Arm(hwMap,Arm.FRONT_ARM);
+        if (hasArm) backArm = new Arm(hwMap, Arm.BACK_ARM);
 
 
 

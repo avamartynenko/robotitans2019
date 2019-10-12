@@ -37,6 +37,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
  * It uses the common Pushbot hardware class to define the drive on the robot.
@@ -98,12 +100,25 @@ public class AutonTest extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
+
+            robot.hookLatch.latch();
+            sleep(300000);
+
+            //robot.linearMove(robot.FORWARD, 0.4, 15);
+            //sleep(5000);
+
+            robot.hookLatch.release();
+            sleep(3000);
+
+            robot.hookLatch.stop();
+            sleep(10000);
+
+
             robot.linearMove(robot.FORWARD, 0.4, 18);
 
             sleep(5000);
 
-            telemetry.addData("Path", "went forward");
-            telemetry.update();
+             telemetry.update();
 
             robot.linearMove(robot.RIGHT, 0.4, 73);
 
