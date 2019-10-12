@@ -30,14 +30,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
@@ -106,7 +100,6 @@ public class AutonTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-<<<<<<< HEAD
         if (opModeIsActive())
         {
 /*            // get cube
@@ -150,28 +143,13 @@ public class AutonTest extends LinearOpMode {
             linearMoveWrapper(robot.FORWARD, 19, true);
             linearMoveWrapper(robot.RIGHT, 26, false);
 /*
-=======
-        if (opModeIsActive()) {
-
-            robot.hookLatch.latch();
-            sleep(300000);
-
-            //robot.linearMove(robot.FORWARD, 0.4, 15);
-            //sleep(5000);
-
-            robot.hookLatch.release();
-            sleep(3000);
-
-            robot.hookLatch.stop();
-            sleep(10000);
-
->>>>>>> 7f4d26f8bcde6c28cecba67556aa861982de2756
 
             robot.linearMove(robot.FORWARD, 0.4, 18);
 
             sleep(5000);
 
-             telemetry.update();
+            telemetry.addData("Path", "went forward");
+            telemetry.update();
 
             robot.linearMove(robot.RIGHT, 0.4, 73);
 
@@ -204,7 +182,7 @@ public class AutonTest extends LinearOpMode {
 
 //            String strPath = "FORWARD .4:18~RIGHT  .4:73~REVERSE .4:15~LEFT .4:35";
 
-  //          followLinearPath(strPath, 5000);
+            //          followLinearPath(strPath, 5000);
 
             telemetry.addData("Path", "Complete :))))");
             telemetry.update();
