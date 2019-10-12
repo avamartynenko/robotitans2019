@@ -100,7 +100,7 @@ public class ServoTest extends LinearOpMode {
 
             //testHooks();
             //sleep(10000);
-            testArm(robot.frontArm);
+            testArm(robot.backArm);
             //testArm2(robot.backArm);
             /*robot.frontArm.goDown(0.2);
             sleep(3000);
@@ -148,28 +148,19 @@ public class ServoTest extends LinearOpMode {
 
 
 
-
-
     public void testArm(Arm armToTest){
 
-
-        armToTest.dropServo.setDirection(DcMotorSimple.Direction.REVERSE);
-        telemetry.addData("Path 1",armToTest.dropServo.getDirection());
-        armToTest.dropServo.setPower(0.1);
+        armToTest.goDown(0.1);
         sleep(3000);
 
-        armToTest.dropServo.setPower(0);
+        armToTest.stop();
         sleep(1000);
 
 
-        armToTest.collectServo.setDirection(DcMotorSimple.Direction.REVERSE);
-        telemetry.addData("Path 2",armToTest.collectServo.getDirection());
-        armToTest.collectServo.setPower(0.5);
+        armToTest.latchStone(0.5);
         sleep(3000);
 
-        armToTest.dropServo.setDirection(DcMotorSimple.Direction.FORWARD);
-        telemetry.addData("Path 3",armToTest.dropServo.getDirection());
-        armToTest.dropServo.setPower(0.075);
+        armToTest.liftUp(0.1);
         sleep(3000);
 
         //armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -179,33 +170,6 @@ public class ServoTest extends LinearOpMode {
 
         //armToTest.dropServo.setPower(0);
         sleep(1000);
-    }
-
-
-
-
-    public void testArm2(Arm armToTest){
-
-        armToTest.dropServo.setDirection(DcMotorSimple.Direction.FORWARD);
-        telemetry.addData("Path 1",armToTest.dropServo.getDirection());
-        armToTest.dropServo.setPower(0.1);
-        sleep(3000);
-
-        armToTest.dropServo.setPower(0);
-        sleep(1000);
-
-        armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
-        telemetry.addData("Path 2",armToTest.collectServo.getDirection());
-        armToTest.collectServo.setPower(0.5);
-        sleep(3000);
-
-        armToTest.dropServo.setDirection(DcMotorSimple.Direction.REVERSE);
-        telemetry.addData("Path 3",armToTest.dropServo.getDirection());
-        armToTest.dropServo.setPower(0.1);
-        sleep(5-000);
-
-        robot.linearMove(robot.LEFT,0.45,35);
-
     }
 
 
