@@ -168,7 +168,8 @@ public class ServoTest extends LinearOpMode {
         //armToTest.collectServo.setPower(0.075);
         //sleep(3000);
 
-        //armToTest.dropServo.setPower(0);
+        // release all motors
+        armToTest.dropServo.setPower(0);
         sleep(1000);
     }
 
