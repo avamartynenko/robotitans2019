@@ -80,7 +80,7 @@ public class AutonTest extends LinearOpMode {
     static final double WALL_OVERRUN = 1; // home much father we run into the wall
     static final double WALL_RECOIL = .5; // how far we pull back from the wall
     static final double START_SPEED = .5; // highest possible speed with no slippage
-    static final double MAX_SPEED = .5;
+    static final double MAX_SPEED = .75;
 
     @Override
     public void runOpMode() {
@@ -102,42 +102,51 @@ public class AutonTest extends LinearOpMode {
 
         if (opModeIsActive())
         {
-/*            // get cube
+            // get cube
             linearMoveWrapper(robot.FORWARD, 27, true); // runinto the wall
             linearMoveWrapper(robot.RIGHT, 27, false);
 
+
             // TODO: put get cube code here
+
+            telemetry.addData("Status", "Engaging arm");
+            telemetry.update();
+            testArm(robot.frontArm);
+
 
             // place cube
             linearMoveWrapper(robot.LEFT, 28, true);
-            linearMoveWrapper(robot.REVERSE, 120, true);
-            sleep(100);*/
+            linearMoveWrapper(robot.REVERSE, 127, true);
+            sleep(50);
 
            // linearMoveWrapper(robot.RIGHT, 29, false);
-            robot.linearMove(robot.RIGHT, MAX_SPEED*0.75, 31);
+            robot.linearMove(robot.RIGHT, MAX_SPEED*0.8, 31);
             //linearMoveWrapper(robot.FORWARD,10, false);
-            robot.linearMove(robot.FORWARD, MAX_SPEED*0.75, 12);
+            robot.linearMove(robot.FORWARD, MAX_SPEED*0.8, 12);
             // TODO: put place cube code here
+
+            dropCube(robot.frontArm);
 
             // pullback and rotate
             //linearMoveWrapper(robot.LEFT, 4, false);
-            robot.linearMove(robot.LEFT, MAX_SPEED*0.5, 4);
+            robot.linearMove(robot.LEFT, MAX_SPEED*0.6, 4);
             //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
-            robot.gyroMove(robot.GYRO_LEFT, MAX_SPEED*0.75,85);
+            robot.gyroMove(robot.GYRO_LEFT, MAX_SPEED*0.8,85);
             //linearMoveWrapper(robot.REVERSE, 4, false);
-            robot.linearMove(robot.REVERSE, MAX_SPEED*0.25, 4);
+            robot.linearMove(robot.REVERSE, MAX_SPEED*0.3, 5);
             // TODO: put grab platform code here
 
             Hooks rbHooks = new Hooks(hardwareMap);
             rbHooks.latch();
-            sleep(3000);
+            sleep(1500);
 
             // pull platform back
             //linearMoveWrapper(robot.FORWARD, 32, false);
-            robot.linearMove(robot.FORWARD, MAX_SPEED*0.75, 35);
+            robot.linearMove(robot.FORWARD, MAX_SPEED*0.8, 36);
 
+            rbHooks.stop();
             rbHooks.release();
-            sleep(3000);
+            sleep(500);
             rbHooks.stop();
 
             // push platform to the corner
@@ -148,7 +157,7 @@ public class AutonTest extends LinearOpMode {
             // retreat and park under the bridge
 
             linearMoveWrapper(robot.FORWARD, 19, true);
-            linearMoveWrapper(robot.RIGHT, 23, false);
+            linearMoveWrapper(robot.RIGHT, 25, false);
 /*
 
             robot.linearMove(robot.FORWARD, 0.4, 18);
@@ -317,6 +326,68 @@ public class AutonTest extends LinearOpMode {
             strMessage = "moved back";
 
         telemetry.addData("Path", strMessage);
+        telemetry.update();
+    }
+
+    public void testArm(Arm armToTest){
+
+        telemetry.addData("Status", "Start arm motions...");
+        telemetry.update();
+
+        armToTest.goDown(0.1);
+        sleep(3000);
+
+        armToTest.stop();
+        sleep(1000);
+
+
+        armToTest.latchStone(0.5);
+        sleep(3000);
+
+        armToTest.liftUp(0.1);
+        sleep(3000);
+
+        //armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        //telemetry.addData("Path 4",armToTest.collectServo.getDirection());
+        //armToTest.collectServo.setPower(0.075);
+        //sleep(3000);
+
+        // release all motors
+        armToTest.dropServo.setPower(0);
+        //sleep(1000);
+
+        telemetry.addData("Status", "Arm motions complete");
+        telemetry.update();
+    }
+
+    public void dropCube(Arm armToTest){
+
+        telemetry.addData("Status", "Start arm motions...");
+        telemetry.update();
+
+        armToTest.goDown(0.1);
+        sleep(3000);
+
+        armToTest.stop();
+        sleep(1000);
+
+
+        armToTest.releaseStone(0.5);
+        sleep(3000);
+
+        armToTest.liftUp(0.1);
+        sleep(3000);
+
+        //armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        //telemetry.addData("Path 4",armToTest.collectServo.getDirection());
+        //armToTest.collectServo.setPower(0.075);
+        //sleep(3000);
+
+        // release all motors
+        armToTest.dropServo.setPower(0);
+        sleep(1000);
+
+        telemetry.addData("Status", "Arm motions complete");
         telemetry.update();
     }
 }
