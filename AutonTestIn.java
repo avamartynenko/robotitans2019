@@ -60,9 +60,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="AutonTest", group="Pushbot")
+@Autonomous(name="AutonTestIn", group="Pushbot")
 //@Disabled
-public class AutonTest extends LinearOpMode {
+public class AutonTestIn extends LinearOpMode {
 
     /* Declare OpMode members. */
     CompetitionHardware robot = new CompetitionHardware();   // Use a Pushbot's hardware
@@ -104,7 +104,7 @@ public class AutonTest extends LinearOpMode {
         {
             // get cube
             linearMoveWrapper(robot.FORWARD, 27, true); // runinto the wall
-            linearMoveWrapper(robot.RIGHT, 27, false);
+            linearMoveWrapper(robot.RIGHT, 26.5, false);
 
 
             // TODO: put get cube code here
@@ -116,7 +116,7 @@ public class AutonTest extends LinearOpMode {
 
             // place cube
             linearMoveWrapper(robot.LEFT, 28, true);
-            linearMoveWrapper(robot.REVERSE, 127, true);
+            robot.linearMove(robot.REVERSE, 1, 128);
             sleep(50);
 
            // linearMoveWrapper(robot.RIGHT, 29, false);
@@ -334,18 +334,18 @@ public class AutonTest extends LinearOpMode {
         telemetry.addData("Status", "Start arm motions...");
         telemetry.update();
 
-        armToTest.goDown(0.1);
-        sleep(3000);
+        armToTest.goDown(0.5);
+        sleep(1500);
 
         armToTest.stop();
-        sleep(1000);
+        sleep(500);
 
 
         armToTest.latchStone(0.5);
-        sleep(3000);
+        sleep(1500);
 
-        armToTest.liftUp(0.1);
-        sleep(3000);
+        armToTest.liftUp(0.5);
+        sleep(1500);
 
         //armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
         //telemetry.addData("Path 4",armToTest.collectServo.getDirection());
@@ -365,18 +365,18 @@ public class AutonTest extends LinearOpMode {
         telemetry.addData("Status", "Start arm motions...");
         telemetry.update();
 
-        armToTest.goDown(0.1);
-        sleep(3000);
+        armToTest.goDown(0.5);
+        sleep(2500);
 
         armToTest.stop();
         sleep(1000);
 
 
         armToTest.releaseStone(0.5);
-        sleep(3000);
+        sleep(2500);
 
-        armToTest.liftUp(0.1);
-        sleep(3000);
+        armToTest.liftUp(0.5);
+        sleep(2500);
 
         //armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
         //telemetry.addData("Path 4",armToTest.collectServo.getDirection());
