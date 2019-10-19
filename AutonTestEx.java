@@ -111,6 +111,9 @@ public class AutonTestEx extends LinearOpMode {
 
             telemetry.addData("Status", "Engaging arm");
             telemetry.update();
+
+//            ArmController acArms = new ArmController( this);
+
             testArm(robot.frontArm);
 
 

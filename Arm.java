@@ -82,7 +82,7 @@ public class Arm {
 
         collectServo.setPower(0);
         setDirectionDropServo(UP, collectServo);
-        collectServo.setPower(0);
+        collectServo.setPower(power);
 
     }
 
