@@ -97,12 +97,30 @@ public class AutonTestIn extends LinearOpMode {
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "init");    //
         telemetry.update();
-        // Wait for the game to start (driver presses PLAY)
+        // Wait for 66the game to start (driver presses PLAY)
         waitForStart();
 
         if (opModeIsActive())
         {
-            // get cube
+
+            robot.linearMove(robot.RIGHT, MAX_SPEED*0.7, 26.5);
+            sleep(1000);
+
+            robot.linearMove(robot.FORWARD, MAX_SPEED*0.7, 25);
+            sleep(1000);
+
+            getCube(robot.frontArm);
+
+
+            robot.linearMove(robot.REVERSE, MAX_SPEED, 85);
+            sleep(1000);
+
+           dropCube(robot.frontArm);
+
+            robot.linearMove(robot.FORWARD, MAX_SPEED, 45);
+            sleep(1000);
+
+/*            // get cube
             linearMoveWrapper(robot.FORWARD, 27, true); // runinto the wall
             linearMoveWrapper(robot.RIGHT, 26.5, false);
 
@@ -112,6 +130,9 @@ public class AutonTestIn extends LinearOpMode {
             telemetry.addData("Status", "Engaging arm");
             telemetry.update();
             testArm(robot.frontArm);
+
+
+
 
 
             // place cube
@@ -157,7 +178,7 @@ public class AutonTestIn extends LinearOpMode {
             // retreat and park under the bridge
 
             linearMoveWrapper(robot.FORWARD, 19, true);
-            linearMoveWrapper(robot.RIGHT, 25, false);
+            linearMoveWrapper(robot.RIGHT, 25, false);*/
 /*
 
             robot.linearMove(robot.FORWARD, 0.4, 18);
@@ -329,7 +350,7 @@ public class AutonTestIn extends LinearOpMode {
         telemetry.update();
     }
 
-    public void testArm(Arm armToTest){
+    public void getCube(Arm armToTest){
 
         telemetry.addData("Status", "Start arm motions...");
         telemetry.update();
@@ -366,17 +387,17 @@ public class AutonTestIn extends LinearOpMode {
         telemetry.update();
 
         armToTest.goDown(0.5);
-        sleep(2500);
+        sleep(2000);
 
         armToTest.stop();
-        sleep(1000);
+        sleep(500);
 
 
         armToTest.releaseStone(0.5);
-        sleep(2500);
+        sleep(2000);
 
         armToTest.liftUp(0.5);
-        sleep(2500);
+        sleep(2000);
 
         //armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
         //telemetry.addData("Path 4",armToTest.collectServo.getDirection());
@@ -385,7 +406,7 @@ public class AutonTestIn extends LinearOpMode {
 
         // release all motors
         armToTest.dropServo.setPower(0);
-        sleep(1000);
+        sleep(500);
 
         telemetry.addData("Status", "Arm motions complete");
         telemetry.update();
