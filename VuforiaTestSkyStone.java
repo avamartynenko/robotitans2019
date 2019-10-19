@@ -50,6 +50,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
+import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
 
 /**
  * This 2019-2020 OpMode illustrates the basics of using the Vuforia localizer to determine
@@ -84,7 +85,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 @TeleOp(name="VuforiaTestSkyStone", group ="Concept")
 //@Disabled
-public class VuforiaTest2 extends LinearOpMode {
+public class VuforiaTestSkyStone extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
@@ -92,8 +93,8 @@ public class VuforiaTest2 extends LinearOpMode {
     //
     // NOTE: If you are running on a CONTROL HUB, with only one USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
     //
-    private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-    private static final boolean PHONE_IS_PORTRAIT = false  ;
+    private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = FRONT;
+    private static final boolean PHONE_IS_PORTRAIT = true  ;
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -108,7 +109,7 @@ public class VuforiaTest2 extends LinearOpMode {
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            "AYFREzX/////AAABmcPnFDqISEdopgXOzlcGHJt80ccNfKjcnQKVKS26WHgE3ehNGdF0oZsKGUtXr7sKpnbD/tq8zOnTDgIKOLDh4hsDolTJrjjqYOOMoRw2fG40nw8kIEC70ttSJJ2B8POSgOA5itYlC06rvBRT8GWK9+kxR8kIKqryIb7k3/cA+eXX2q3bS49AnxB21ZpLsBpoh4OebPoJcY8qxs+7uNi6p/Fqb3ShFX1O/Vuq0LOITiMjQW/7eTXPp+ZUMfx183wQnZKH3jnEpqFfp1jUAw/pKGGojD7O6Pj7ZXf0EmD9LN58V8PiVv8qizUyHQTOnuo04HrhzbKs/j5SzLsXf1CsOnGb9ayhEcFJi62bH013P0Ad";
+            " AYFREzX/////AAABmcPnFDqISEdopgXOzlcGHJt80ccNfKjcnQKVKS26WHgE3ehNGdF0oZsKGUtXr7sKpnbD/tq8zOnTDgIKOLDh4hsDolTJrjjqYOOMoRw2fG40nw8kIEC70ttSJJ2B8POSgOA5itYlC06rvBRT8GWK9+kxR8kIKqryIb7k3/cA+eXX2q3bS49AnxB21ZpLsBpoh4OebPoJcY8qxs+7uNi6p/Fqb3ShFX1O/Vuq0LOITiMjQW/7eTXPp+ZUMfx183wQnZKH3jnEpqFfp1jUAw/pKGGojD7O6Pj7ZXf0EmD9LN58V8PiVv8qizUyHQTOnuo04HrhzbKs/j5SzLsXf1CsOnGb9ayhEcFJi62bH013P0Ad ";
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
@@ -130,7 +131,8 @@ public class VuforiaTest2 extends LinearOpMode {
     private static final float quadField  = 36 * mmPerInch;
 
     // Class Members
-    private OpenGLMatrix lastLocation = null;
+    private OpenGLMatrix
+            lastLocation = null;
     private VuforiaLocalizer vuforia = null;
     private boolean targetVisible = false;
     private float phoneXRotate    = 0;
@@ -150,6 +152,7 @@ public class VuforiaTest2 extends LinearOpMode {
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection   = CAMERA_CHOICE;
+
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
