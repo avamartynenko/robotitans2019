@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  *
  */
 
-@Autonomous(name="BasicAuton", group="Pushbot")
+//@Autonomous(name="BasicAuton", group="Pushbot")
 //@Disabled
 public class BasicAuton extends LinearOpMode {
 
@@ -54,6 +54,19 @@ public class BasicAuton extends LinearOpMode {
     public static final int SKYSTONE_RIGHT = 300;
     public static final int GAME_ALLIANCE_RED = 1000;
     public static final int GAME_ALLIANCE_BLUE = 2000;
+
+    // pushed up form AutonTest
+    static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
+    static final double DRIVE_GEAR_REDUCTION = 2.0;     // This is < 1.0 if geared UP
+    static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * Math.PI);
+
+    static final int MOVE_PAUSE = 100; // delay between linear moves
+    static final double WALL_OVERRUN = 1; // home much father we run into the wall
+    static final double WALL_RECOIL = .5; // how far we pull back from the wall
+    static final double START_SPEED = .5; // highest possible speed with no slippage
+    static final double MAX_SPEED = .75;
 
 
 
@@ -75,7 +88,6 @@ public class BasicAuton extends LinearOpMode {
         waitForStart();
 
         if (opModeIsActive()) {
-
 
             telemetry.addData("Path", "Complete :))))");
             telemetry.update();
@@ -183,5 +195,95 @@ public class BasicAuton extends LinearOpMode {
 
     }
 
+    public void getCube(Arm armToTest){
+
+        telemetry.addData("Status", "Start arm motions...");
+        telemetry.update();
+
+        armToTest.goDown(0.5);
+        sleep(1500);
+
+        armToTest.stop();
+        sleep(500);
+
+
+        armToTest.latchStone(0.5);
+        sleep(1500);
+
+        armToTest.liftUp(0.5);
+        sleep(1500);
+
+        //armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        //telemetry.addData("Path 4",armToTest.collectServo.getDirection());
+        //armToTest.collectServo.setPower(0.075);
+        //sleep(3000);
+
+        // release all motors
+        armToTest.dropServo.setPower(0);
+        //sleep(1000);
+
+        telemetry.addData("Status", "Arm motions complete");
+        telemetry.update();
+    }
+
+    public void dropCube(Arm armToTest){
+
+        telemetry.addData("Status", "Start arm motions...");
+        telemetry.update();
+
+        armToTest.goDown(0.5);
+        sleep(2500);
+
+        armToTest.stop();
+        sleep(1000);
+
+
+        armToTest.releaseStone(0.5);
+        sleep(2500);
+
+        armToTest.liftUp(0.5);
+        sleep(2500);
+
+        //armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
+        //telemetry.addData("Path 4",armToTest.collectServo.getDirection());
+        //armToTest.collectServo.setPower(0.075);
+        //sleep(3000);
+
+        // release all motors
+        armToTest.dropServo.setPower(0);
+        sleep(1000);
+
+        telemetry.addData("Status", "Arm motions complete");
+        telemetry.update();
+    }
+
+    public int reverseDirection(int Direction)
+    {
+        if(Direction == robot.LEFT)
+            return robot.RIGHT;
+        else if(Direction == robot.FORWARD)
+            return robot.REVERSE;
+        else if(Direction == robot.RIGHT)
+            return robot.LEFT;
+        else
+            return robot.FORWARD;
+    }
+
+    public String decodeDirection(int Direction)
+    {
+        if(Direction == robot.LEFT)
+            return "right";
+        else if(Direction == robot.FORWARD)
+            return "reverse";
+        else if(Direction == robot.RIGHT)
+            return "right";
+        else
+            return "forward";
+    }
+
+    int linearMoveWrapper(int direction, double speed, double distance)
+    {
+        return robot.linearMove(direction, speed, distance);
+    }
 }
 
