@@ -153,11 +153,11 @@ public class SkylerTeleop extends LinearOpMode {
 
             if(gamepad2.y){
 
-                robot.frontArm.liftUp(0.3);
+                robot.frontArm.liftUp(0.4);
             }
             else if(gamepad2.a){
 
-                robot.frontArm.goDown(0.3);
+                robot.frontArm.goDown(0.4);
             }
             else {
 
@@ -167,11 +167,11 @@ public class SkylerTeleop extends LinearOpMode {
 
             if(gamepad2.x){
 
-                robot.frontArm.releaseStone(0.3);
+                robot.frontArm.releaseStone(0.4);
             }
             else if(gamepad2.b){
 
-                robot.frontArm.latchStone(0.3);
+                robot.frontArm.latchStone(0.4);
             }
             else{
 
@@ -181,8 +181,6 @@ public class SkylerTeleop extends LinearOpMode {
 
 
         }
-
-
 
 
             // Show the elapsed game time and wheel power.
