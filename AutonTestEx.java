@@ -69,7 +69,7 @@ public class AutonTestEx extends BasicAuton {
 
         // refresh competition hardware, arm. hook
         // code is in servotest class
-
+        super.initialize();
         /*
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
@@ -77,7 +77,7 @@ public class AutonTestEx extends BasicAuton {
         //robot.init(hardwareMap, true, false, true);
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "init");    //
+        telemetry.addData("Status", "init AutonTestEx");    //
         telemetry.update();
         // Wait for the game to start (driver presses PLAY)
         waitForStart();

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class AutonTestExBlue extends AutonTestEx {
 
     public AutonTestExBlue(){
-    super.setAllinceColor(BasicAuton.GAME_ALLIANCE_BLUE);
+    super.setAllianceColor(BasicAuton.GAME_ALLIANCE_BLUE);
     }
 
 }

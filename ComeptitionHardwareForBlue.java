@@ -13,14 +13,14 @@ public class ComeptitionHardwareForBlue extends CompetitionHardware {
     public void setDirection(int direction){
 
         switch (direction){
-            case FORWARD:
+            case REVERSE:
                 frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
                 backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
                 backRight.setDirection(DcMotorSimple.Direction.FORWARD);
                 break;
 
-            case REVERSE:
+            case FORWARD:
                 frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
                 frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
                 backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
