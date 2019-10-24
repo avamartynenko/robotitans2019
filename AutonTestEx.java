@@ -74,7 +74,7 @@ public class AutonTestEx extends BasicAuton {
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        robot.init(hardwareMap, true, false, true);
+        //robot.init(hardwareMap, true, false, true);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "init");    //

@@ -43,7 +43,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class BasicAuton extends LinearOpMode {
 
     /* Declare OpMode members. */
-    CompetitionHardware robot = new CompetitionHardware();
+    CompetitionHardware robot;
     Arm choiceOfArm;
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -55,12 +55,10 @@ public class BasicAuton extends LinearOpMode {
     public static final int GAME_ALLIANCE_RED = 1000;
     public static final int GAME_ALLIANCE_BLUE = 2000;
 
-    // pushed up form AutonTest
-    static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
-    static final double DRIVE_GEAR_REDUCTION = 2.0;     // This is < 1.0 if geared UP
-    static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
-    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * Math.PI);
+
+    public int allinceColor = GAME_ALLIANCE_RED;
+
+
 
     static final int MOVE_PAUSE = 100; // delay between linear moves
     static final double WALL_OVERRUN = 1; // home much father we run into the wall
@@ -77,7 +75,8 @@ public class BasicAuton extends LinearOpMode {
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        robot.init(hardwareMap, true, false, true);
+        //robot.init(hardwareMap, true, false, true);
+        initialize();
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "init");    //
@@ -91,6 +90,24 @@ public class BasicAuton extends LinearOpMode {
 
             telemetry.addData("Path", "Complete :))))");
             telemetry.update();
+        }
+
+    }
+
+
+    public void initialize(){
+
+
+        switch (allinceColor){
+
+            case GAME_ALLIANCE_BLUE:
+                robot = new ComeptitionHardwareForBlue();
+                break;
+
+                default:
+                        robot = new CompetitionHardware();
+                    break;
+
         }
 
     }
@@ -285,5 +302,10 @@ public class BasicAuton extends LinearOpMode {
     {
         return robot.linearMove(direction, speed, distance);
     }
+
+    public void setAllinceColor(int allinceColor) {
+        this.allinceColor = allinceColor;
+    }
+
 }
 
