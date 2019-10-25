@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -56,9 +55,15 @@ public class BasicAuton extends LinearOpMode {
     public static final int GAME_ALLIANCE_BLUE = 2000;
 
 
-    public int allinceColor = GAME_ALLIANCE_RED;
+    public int allianceColor = GAME_ALLIANCE_RED;
 
-
+    /*
+    public BasicAuton(){
+        initialize();
+        telemetry.addData("Status Basic Auton", "init complete"+robot.toString());    //
+        telemetry.update();
+    }
+     */
 
     static final int MOVE_PAUSE = 100; // delay between linear moves
     static final double WALL_OVERRUN = 1; // home much father we run into the wall
@@ -70,45 +75,29 @@ public class BasicAuton extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-        /*
-         * Initialize the drive system variables.
-         * The init() method of the hardware class does all the work here
-         */
-        //robot.init(hardwareMap, true, false, true);
-        initialize();
-
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "init");    //
-        telemetry.update();
-
-
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-
-        if (opModeIsActive()) {
-
-            telemetry.addData("Path", "Complete :))))");
-            telemetry.update();
-        }
-
     }
 
 
     public void initialize(){
 
+        telemetry.addData("Status", "initialize BasicAuton"+ allianceColor);    //
+        telemetry.update();
 
-        switch (allinceColor){
+        switch (allianceColor){
 
             case GAME_ALLIANCE_BLUE:
                 robot = new ComeptitionHardwareForBlue();
                 break;
 
-                default:
-                        robot = new CompetitionHardware();
-                    break;
+            default:
+                robot = new CompetitionHardware();
+                break;
 
         }
+
+        robot.init(hardwareMap, true, false, true);
+
+        setChoiceOfArm();
 
     }
 
@@ -140,9 +129,9 @@ public class BasicAuton extends LinearOpMode {
 
     }
 
-    public void setChoiceOfArm(int gameAllianceColor){
+    public void setChoiceOfArm(){
 
-        switch (gameAllianceColor) {
+        switch (allianceColor) {
             case GAME_ALLIANCE_RED:
                 choiceOfArm = robot.frontArm;
                 break;
@@ -303,8 +292,8 @@ public class BasicAuton extends LinearOpMode {
         return robot.linearMove(direction, speed, distance);
     }
 
-    public void setAllinceColor(int allinceColor) {
-        this.allinceColor = allinceColor;
+    public void setAllianceColor(int allianceColor) {
+        this.allianceColor = allianceColor;
     }
 
 }
