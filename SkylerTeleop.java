@@ -73,6 +73,7 @@ public class SkylerTeleop extends LinearOpMode {
 
 
         robot.init(hardwareMap, true, false, true);
+        robot.initTeleopModules();
 
 
 
@@ -179,6 +180,25 @@ public class SkylerTeleop extends LinearOpMode {
             }
 
 
+            if (gamepad2.left_bumper){
+
+                robot.intakeMech.run(0.5);
+            }
+            else if(gamepad2.right_bumper){
+
+                robot.intakeMech.run(-0.5);
+            }
+            else{
+
+                robot.intakeMech.stop();
+            }
+
+
+
+
+
+
+
 
         }
 
@@ -187,6 +207,8 @@ public class SkylerTeleop extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
+
+
 
 
 
