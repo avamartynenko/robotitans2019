@@ -82,6 +82,7 @@ public class AutonTestEx extends BasicAuton {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+
         if (opModeIsActive())
         {
             // get cube
@@ -93,7 +94,7 @@ public class AutonTestEx extends BasicAuton {
 
 //            ArmController acArms = new ArmController( this);
 
-            getCube(robot.frontArm);
+            getCube(); // basic auton will get the proper arm by its self
 
             // place cube
             linearMoveWrapper(robot.LEFT, MAX_SPEED,28);
@@ -104,13 +105,16 @@ public class AutonTestEx extends BasicAuton {
             //linearMoveWrapper(robot.FORWARD,10, false);
             linearMoveWrapper(robot.FORWARD, MAX_SPEED*0.8, 12);
 
-            dropCube(robot.frontArm);
+            dropCube();  // basic auton will get the proper arm by its self
 
             // pullback and rotate
             linearMoveWrapper(robot.LEFT, MAX_SPEED*0.6, 4);
             //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
             robot.gyroMove(robot.GYRO_LEFT, MAX_SPEED*0.8,85);
             //linearMoveWrapper(robot.REVERSE, 4, false);
+
+            reOrient();  // will change orientation based on alliance color
+
             linearMoveWrapper(robot.REVERSE, MAX_SPEED*0.3, 5);
 
             // Grab and pull the platform
