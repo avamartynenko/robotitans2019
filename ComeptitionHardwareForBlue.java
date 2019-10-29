@@ -18,7 +18,7 @@ public class ComeptitionHardwareForBlue extends CompetitionHardware {
 
 
 
-
+    @Override
     public void setDirection(int direction){
 
         switch (currentOrtientation){
