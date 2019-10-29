@@ -75,6 +75,7 @@ public class CompetitionHardware
     public boolean activateSpeedProfile = false;
     public Hooks hookLatch = null;
     public IntakeMech intakeMech = null;
+    public LiftMech liftMech = null;
     public Arm frontArm = null;
     public Arm backArm = null;
 
@@ -157,6 +158,7 @@ public class CompetitionHardware
     public void initTeleopModules(){
 
         intakeMech = new IntakeMech(hwMap);
+        liftMech = new LiftMech(hwMap);
 
 
 

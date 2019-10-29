@@ -180,13 +180,18 @@ public class SkylerTeleop extends LinearOpMode {
             }
 
 
-            if (gamepad2.left_bumper){
+            if (gamepad2.left_trigger > 0){
 
-                robot.intakeMech.run(0.5);
+                robot.intakeMech.run(gamepad2.left_trigger);
+            } else{
+
+                robot.intakeMech.stop();
             }
-            else if(gamepad2.right_bumper){
 
-                robot.intakeMech.run(-0.5);
+
+            if(gamepad2.right_trigger > 0){
+
+                robot.intakeMech.run(-gamepad2.right_trigger);
             }
             else{
 
@@ -194,6 +199,27 @@ public class SkylerTeleop extends LinearOpMode {
             }
 
 
+
+            robot.liftMech.runElevator(-gamepad2.left_stick_y);
+
+
+
+
+            if (gamepad2.left_bumper){
+
+                robot.liftMech.grabStone(0.5);
+
+            }
+            else if (gamepad2.right_bumper){
+
+                robot.liftMech.grabStone(-0.5);
+            }
+            else{
+
+                robot.liftMech.grabStone(0);
+            }
+
+            robot.liftMech.twistLift(-gamepad2.right_stick_x);
 
 
 
