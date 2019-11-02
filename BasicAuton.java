@@ -54,7 +54,6 @@ public class BasicAuton extends LinearOpMode {
     public static final int GAME_ALLIANCE_RED = 1000;
     public static final int GAME_ALLIANCE_BLUE = 2000;
 
-
     public int allianceColor = GAME_ALLIANCE_RED;
 
     /*

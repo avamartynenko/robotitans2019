@@ -62,7 +62,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name="AutonTestIn", group="Pushbot")
 //@Disabled
-public class AutonTestIn extends LinearOpMode {
+public class AutonTestIn extends BasicAuton {
 
     /* Declare OpMode members. */
     CompetitionHardware robot = new CompetitionHardware();   // Use a Pushbot's hardware

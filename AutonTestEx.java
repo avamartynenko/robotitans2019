@@ -97,7 +97,7 @@ public class AutonTestEx extends BasicAuton {
             getCube(); // basic auton will get the proper arm by its self
 
             // place cube
-            linearMoveWrapper(robot.LEFT, MAX_SPEED,28);
+            linearMoveWrapper(robot.LEFT, MAX_SPEED,27);
             linearMoveWrapper(robot.REVERSE, 1, 128);
             sleep(50);
 
@@ -110,7 +110,7 @@ public class AutonTestEx extends BasicAuton {
             // pullback and rotate
             linearMoveWrapper(robot.LEFT, MAX_SPEED*0.6, 4);
             //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
-            robot.gyroMove(robot.GYRO_LEFT, MAX_SPEED*0.8,85);
+            robot.gyroMove(robot.GYRO_LEFT, MAX_SPEED*0.8,80);
             //linearMoveWrapper(robot.REVERSE, 4, false);
 
             reOrient();  // will change orientation based on alliance color

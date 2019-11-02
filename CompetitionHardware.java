@@ -144,7 +144,6 @@ public class CompetitionHardware
         backRight.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
         frontRight.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
 
-
         // Set all motors to zero power
         setPower4WDrive(0);
 
