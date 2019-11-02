@@ -134,15 +134,23 @@ public class BasicAuton extends LinearOpMode {
         switch (allianceColor) {
             case GAME_ALLIANCE_RED:
                 choiceOfArm = robot.frontArm;
+                telemetry.addData("ChoiceOfArm", " frontArm");
+                telemetry.update();
                 break;
 
             case GAME_ALLIANCE_BLUE:
                 choiceOfArm = robot.backArm;
+                telemetry.addData("ChoiceOfArm", " backArm");
+                telemetry.update();
                 break;
 
             default:
                 break;
         }
+
+
+
+
 
     }
 
@@ -162,6 +170,7 @@ public class BasicAuton extends LinearOpMode {
     }
 
     public void moveToFoundation(int skyStonePosition){
+
 
         switch (skyStonePosition) {
             case SKYSTONE_LEFT:
@@ -201,22 +210,22 @@ public class BasicAuton extends LinearOpMode {
 
     }
 
-    public void getCube(Arm armToTest){
+    public void getCube(){
 
         telemetry.addData("Status", "Start arm motions...");
         telemetry.update();
 
-        armToTest.goDown(0.5);
+        choiceOfArm.goDown(0.5);
         sleep(1500);
 
-        armToTest.stop();
-        sleep(500);
+        choiceOfArm.stop();
+        //sleep(500);
 
 
-        armToTest.latchStone(0.5);
+        choiceOfArm.latchStone(0.5);
         sleep(1500);
 
-        armToTest.liftUp(0.5);
+        choiceOfArm.liftUp(0.5);
         sleep(1500);
 
         //armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -225,29 +234,29 @@ public class BasicAuton extends LinearOpMode {
         //sleep(3000);
 
         // release all motors
-        armToTest.dropServo.setPower(0);
+        choiceOfArm.dropServo.setPower(0);
         //sleep(1000);
 
         telemetry.addData("Status", "Arm motions complete");
         telemetry.update();
     }
 
-    public void dropCube(Arm armToTest){
+    public void dropCube(){
 
         telemetry.addData("Status", "Start arm motions...");
         telemetry.update();
 
-        armToTest.goDown(0.5);
+        choiceOfArm.goDown(0.5);
         sleep(2500);
 
-        armToTest.stop();
-        sleep(1000);
+        choiceOfArm.stop();
+        //sleep(1000);
 
 
-        armToTest.releaseStone(0.5);
+        choiceOfArm.releaseStone(0.5);
         sleep(2500);
 
-        armToTest.liftUp(0.5);
+        choiceOfArm.liftUp(0.5);
         sleep(2500);
 
         //armToTest.collectServo.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -256,8 +265,8 @@ public class BasicAuton extends LinearOpMode {
         //sleep(3000);
 
         // release all motors
-        armToTest.dropServo.setPower(0);
-        sleep(1000);
+        choiceOfArm.dropServo.setPower(0);
+        //sleep(1000);
 
         telemetry.addData("Status", "Arm motions complete");
         telemetry.update();
@@ -294,6 +303,17 @@ public class BasicAuton extends LinearOpMode {
 
     public void setAllianceColor(int allianceColor) {
         this.allianceColor = allianceColor;
+    }
+
+
+    public void reOrient(){
+
+        if (allianceColor == GAME_ALLIANCE_BLUE){
+
+            ComeptitionHardwareForBlue.setCurrentOrtientation(ComeptitionHardwareForBlue.ORIENTATION_TWO);
+
+        }
+
     }
 
 }

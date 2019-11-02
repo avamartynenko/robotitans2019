@@ -74,6 +74,8 @@ public class CompetitionHardware
     public boolean hasArm = true;
     public boolean activateSpeedProfile = false;
     public Hooks hookLatch = null;
+    public IntakeMech intakeMech = null;
+    public LiftMech liftMech = null;
     public Arm frontArm = null;
     public Arm backArm = null;
 
@@ -150,6 +152,16 @@ public class CompetitionHardware
 
         if(needColorSensor) enableColorSensor();
         if(needGyro) enableGyro();
+
+    }
+
+    public void initTeleopModules(){
+
+        intakeMech = new IntakeMech(hwMap);
+        liftMech = new LiftMech(hwMap);
+
+
+
 
     }
 

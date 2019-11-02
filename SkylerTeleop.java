@@ -73,6 +73,7 @@ public class SkylerTeleop extends LinearOpMode {
 
 
         robot.init(hardwareMap, true, false, true);
+        robot.initTeleopModules();
 
 
 
@@ -179,6 +180,51 @@ public class SkylerTeleop extends LinearOpMode {
             }
 
 
+            if (gamepad2.left_trigger > 0){
+
+                robot.intakeMech.run(gamepad2.left_trigger);
+            } else{
+
+                robot.intakeMech.stop();
+            }
+
+
+            if(gamepad2.right_trigger > 0){
+
+                robot.intakeMech.run(-gamepad2.right_trigger);
+            }
+            else{
+
+                robot.intakeMech.stop();
+            }
+
+
+
+            robot.liftMech.runElevator(-gamepad2.left_stick_y);
+
+
+
+
+            if (gamepad2.left_bumper){
+
+                robot.liftMech.grabStone(0.5);
+
+            }
+            else if (gamepad2.right_bumper){
+
+                robot.liftMech.grabStone(-0.5);
+            }
+            else{
+
+                robot.liftMech.grabStone(0);
+            }
+
+            robot.liftMech.twistLift(-gamepad2.right_stick_x);
+
+
+
+
+
 
         }
 
@@ -187,6 +233,8 @@ public class SkylerTeleop extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
+
+
 
 
 
