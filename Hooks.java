@@ -20,8 +20,6 @@ public class Hooks {
         hookLeft = parentHwMap.get(CRServo.class, "hookLeft");
         hookRight = parentHwMap.get(CRServo.class, "hookRight");
 
-
-
     }
     private void setDirection(int direction){
 

@@ -59,25 +59,31 @@ public class SkylerTeleop extends LinearOpMode {
     CompetitionHardware robot = new CompetitionHardware();   // Use a Pushbot's hardware
     double right_stick_speed;
     double left_stick_speed;
+    boolean elevatorLock = false;
+    boolean initialized = false;
 
 
 
     @Override
     public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
 
         waitForStart();
         runtime.reset();
 
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
 
         robot.init(hardwareMap, true, false, true);
         robot.initTeleopModules();
 
+        if(!initialized) initialize();
+
 
 
         while (opModeIsActive()) {
+
+            telemetry.addData("Twister", "POS: " + robot.liftMech.twister.getPosition());
+            telemetry.addData("Grabber", "POS: " + + robot.liftMech.grabber.getPosition());
 
             if (gamepad1.dpad_up || gamepad1.dpad_right || gamepad1.dpad_down || gamepad1.dpad_left) {
 
@@ -123,9 +129,11 @@ public class SkylerTeleop extends LinearOpMode {
             }
             //gamepad 1 ends here
 
+
+
             //gamepad 2 starts here
 
-
+            //hooks
             if(gamepad2.dpad_up){
 
 
@@ -134,17 +142,15 @@ public class SkylerTeleop extends LinearOpMode {
                 telemetry.update();
 
 
-            }
-            else if (gamepad2.dpad_down){
+            } else if (gamepad2.dpad_down){
 
                 robot.hookLatch.release();
                 telemetry.addData("dPad Down", " " + gamepad2.dpad_down);
                 telemetry.update();
 
-            }
-            else{
+            } else{
 
-                robot.hookLatch.stop();
+                //robot.hookLatch.stop();
                 telemetry.addData(" both down ", " " + gamepad2.dpad_down);
                 telemetry.addData(" both up", " " + gamepad2.dpad_up);
                 telemetry.update();
@@ -152,6 +158,7 @@ public class SkylerTeleop extends LinearOpMode {
 
 
 
+            //front side auton arm
             if(gamepad2.y){
 
                 robot.frontArm.liftUp(0.4);
@@ -180,93 +187,87 @@ public class SkylerTeleop extends LinearOpMode {
             }
 
 
+            //intake motors
             if (gamepad2.left_trigger > 0){
-
                 robot.intakeMech.run(gamepad2.left_trigger);
+            } else if(gamepad2.right_trigger > 0) {
+                robot.intakeMech.run(-gamepad2.right_trigger);
             } else{
 
                 robot.intakeMech.stop();
             }
 
 
-            if(gamepad2.right_trigger > 0){
 
-                robot.intakeMech.run(-gamepad2.right_trigger);
-            }
-            else{
-
-                robot.intakeMech.stop();
-            }
-
-
-
+            //elevator
             robot.liftMech.runElevator(-gamepad2.left_stick_y);
 
-
-
-
-            if (gamepad2.left_bumper){
-
-                robot.liftMech.grabStone(0.5);
+            if(gamepad2.back){
+                if(elevatorLock) {
+                    robot.liftMech.runElevator(0.2);
+                } else {
+                    elevatorLock = false;
+                }
 
             }
-            else if (gamepad2.right_bumper){
 
-                robot.liftMech.grabStone(-0.5);
+
+            //grabber
+            if (gamepad2.left_bumper) {
+
+                robot.liftMech.grabber.setPosition(robot.liftMech.GRABBER_RELEASE_POSITION); //0.15
+                telemetry.addData("grabStone leftB pushing to 0.0", " " + gamepad2.left_bumper);
+                telemetry.update();
+
+            } else if (gamepad2.right_bumper){
+
+                robot.liftMech.grabber.setPosition(robot.liftMech.GRABBER_LOCK_POSITION);
+                telemetry.addData("grabStone rightB pushing to 1.0", " " + gamepad2.right_bumper);
+                telemetry.update();
+
             }
-            else{
 
-                robot.liftMech.grabStone(0);
+
+            //Twist
+            if (gamepad2.right_stick_x < 0)
+            {
+                robot.liftMech.twister.setPosition(robot.liftMech.TWISTER_HOME_POSITION);
+                robot.liftMech.grabber.setPosition(robot.liftMech.GRABBER_RELEASE_POSITION); //0.15
+                //robot.liftMech.grabber.setPosition(1.0);
+            } else if(gamepad2.right_stick_x > 0 ){
+                robot.liftMech.twister.setPosition(robot.liftMech.GRABBER_RELEASE_POSITION);
             }
 
-            robot.liftMech.twistLift(-gamepad2.right_stick_x);
+            //Grab
+            //if (gamepad2.right_stick_y > 0) robot.liftMech.grabber.setPosition(0.90);//0.85
+            //if(gamepad2.right_stick_y < 0 ) robot.liftMech.grabber.setPosition(0.08); //0.15
 
-
-
-
-
+            telemetry.addData("twistLift rightStickX", " " + gamepad2.right_stick_x);
+            telemetry.update();
 
         }
 
 
-            // Show the elapsed game time and wheel power.
+
+
+        // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
 
 
+        public void initialize(){
+            robot.liftMech.twister.setPosition(1.0);
+            robot.liftMech.grabber.setPosition(0.15);
+            robot.frontArm.stop();
+            robot.backArm.stop();
+            robot.hookLatch.stop();
+            telemetry.addData("Status", "Initialized");
+            telemetry.update();
 
-
-
-
-
-
+        }
 
 
     }
 
 
-
-
-
-/*if(gamepad1.right_bumper){
-                robot.frontLeft.setPower(1);
-                robot.frontRight.setPower(-1);
-                robot.backLeft.setPower(-1);
-                robot.backRight.setPower(1);
-
-
-            } else if (gamepad1.left_bumper){t
-                robot.frontLeft.setPower(-1);
-                robot.frontRight.setPower(1);
-                robot.backLeft.setPower(1);
-                robot.backRight.setPower(-1);
-
-            } else {
-                robot.frontLeft.setPower(gamepad1.left_stick_y);
-                robot.frontRight.setPower(gamepad1.right_stick_y);
-                robot.backLeft.setPower(gamepad1.left_stick_y);
-                robot.backRight.setPower(gamepad1.right_stick_y);
-            }
-
- */

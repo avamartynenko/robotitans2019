@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class IntakeMech {
@@ -27,12 +28,12 @@ public class IntakeMech {
 
         switch (direction) {
             case OUT:
-                intakeLeft.setDirection(DcMotor.Direction.REVERSE);
+                intakeLeft.setDirection(DcMotor.Direction.FORWARD);
                 intakeRight.setDirection(DcMotor.Direction.FORWARD);
                 break;
 
             case IN:
-                intakeLeft.setDirection(DcMotor.Direction.FORWARD);
+                intakeLeft.setDirection(DcMotor.Direction.REVERSE);
                 intakeRight.setDirection(DcMotor.Direction.REVERSE);
                 break;
         }
@@ -47,7 +48,7 @@ public class IntakeMech {
         //counterclockwise 2.0 = 100% to 1.5 0% power
 
         intakeLeft.setPower(speed);
-        intakeLeft.setPower(speed);
+        intakeRight.setPower(speed);
     }
 
 
