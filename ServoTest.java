@@ -63,10 +63,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name="ServoTest", group="Pushbot")
 //@Disabled
-public class ServoTest extends LinearOpMode {
+public class ServoTest extends BasicAuton {
 
     /* Declare OpMode members. */
-    CompetitionHardware robot = new CompetitionHardware();   // Use a Pushbot's hardware
+    //CompetitionHardware robot = new CompetitionHardware();   // Use a Pushbot's hardware
     private ElapsedTime runtime = new ElapsedTime();
 
     static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
@@ -84,7 +84,9 @@ public class ServoTest extends LinearOpMode {
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        robot.init(hardwareMap, true, false, true);
+        //robot.init(hardwareMap, true, false, true);
+        super.initialize();
+        robot.initTeleopModules();
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "init");    //
@@ -97,10 +99,102 @@ public class ServoTest extends LinearOpMode {
 
         if (opModeIsActive()) {
 
+            long waitTime = 10000;
+            telemetry.addData("grabber (initial)", " pos:  " + robot.liftMech.grabber.getPosition());
+            telemetry.update();
+
+            robot.liftMech.grabber.setPosition(0.00);
+            telemetry.addData("grabber (0.00)", " pos:  " + robot.liftMech.grabber.getPosition());
+            telemetry.update();
+            sleep(waitTime);
+
+
+            robot.liftMech.grabber.setPosition(0.50);
+            telemetry.addData("grabber (0.5)", " pos:  " + robot.liftMech.grabber.getPosition());
+            telemetry.update();
+            sleep(waitTime);
+
+            robot.liftMech.grabber.setPosition(0.75);
+            telemetry.addData("grabber (0.75)", " pos:  " + robot.liftMech.grabber.getPosition());
+            telemetry.update();
+            sleep(waitTime);
+
+
+            robot.liftMech.grabber.setPosition(1.00);
+            telemetry.addData("grabber (1.0)", " pos:  " + robot.liftMech.grabber.getPosition());
+            telemetry.update();
+            sleep(waitTime);
+
+
+            telemetry.addData("DONE with GRABBER", "");
+            telemetry.update();
+
+            sleep(waitTime+waitTime);
+
+            telemetry.addData("twister (initial)", " pos:  " + robot.liftMech.twister.getPosition());
+            telemetry.update();
+            sleep(waitTime);
+
+            robot.liftMech.twister.setPosition(0.00);
+            telemetry.addData("twister (0.00)", " pos:  " + robot.liftMech.twister.getPosition());
+            telemetry.update();
+            sleep(waitTime);
+
+
+            robot.liftMech.twister.setPosition(0.50);
+            sleep(waitTime);
+            telemetry.addData("twister (0.50)", " pos:  " + robot.liftMech.twister.getPosition());
+            telemetry.update();
+
+
+            robot.liftMech.twister.setPosition(0.75);
+            telemetry.addData("twister (0.75)", " pos:  " + robot.liftMech.twister.getPosition());
+            telemetry.update();
+            sleep(waitTime);
+
+
+
+            robot.liftMech.twister.setPosition(1.00);
+            sleep(waitTime+waitTime);
+            telemetry.addData("DONE with GRABBER", "");
+            telemetry.update();
+
+/*
+            robot.liftMech.twister.setPower(0.7);
+            sleep(2000);
+            robot.liftMech.twister.setPower(-0.7);
+            sleep(2000);
+
+
+            telemetry.addData("Status", "done twistin");
+            robot.liftMech.grabber.setPower(0.7);
+            sleep(2000);
+
+            robot.liftMech.grabber.setPower(-0.7);
+            sleep(2000);
+
+            telemetry.addData("Status", "done grabin");    //
+            telemetry.update();
+
+
+
+            robot.liftMech.twistLift(0.25);
+            sleep(10000);
+            telemetry.addData("Status", "done twistin");    //
+            telemetry.update();
+            robot.liftMech.grabStone(0.25);
+            sleep(10000);
+            telemetry.addData("Status", "done grabin");    //
+            telemetry.update();
+             */
+
+
+
+
 
             //testHooks();
             //sleep(10000);
-            testArm(robot.backArm);
+            //testArm(robot.backArm);
             //testArm2(robot.backArm);
             /*robot.frontArm.goDown(0.2);
             sleep(3000);
