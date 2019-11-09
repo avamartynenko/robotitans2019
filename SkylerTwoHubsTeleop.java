@@ -29,30 +29,27 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-
 
 /**
- * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
- * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
- * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
+ * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
+ * All device access is managed through the HardwarePushbot class.
+ * The code is structured as a LinearOpMode
  *
- * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
- * It includes all the skeletal structure that all linear OpModes contain.
+ * This particular OpMode executes a POV Game style Teleop for a PushBot
+ * In this mode the left stick moves the robot FWD and back, the Right stick turns left and right.
+ * It raises and lowers the claw using the Gampad Y and A buttons respectively.
+ * It also opens and closes the claws slowly using the left and right Bumper buttons.
  *
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="SkylerTeleop", group="Linear Opmode")
+@TeleOp(name="SkylerTwoHubsTeleop", group="Pushbot")
 //@Disabled
-public class SkylerTeleop extends LinearOpMode {
+public class SkylerTwoHubsTeleop extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -63,69 +60,48 @@ public class SkylerTeleop extends LinearOpMode {
     boolean initialized = false;
 
 
-
     @Override
     public void runOpMode() {
 
-        waitForStart();
-        runtime.reset();
 
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
-        robot.init(hardwareMap, true, false, true);
+        /* Initialize the hardware variables.
+         * The init() method of the hardware class does all the work here
+         */
+        robot.init(hardwareMap, false, false, false);
         robot.initTeleopModules();
 
-        if(!initialized) initialize();
 
+        // Send telemetry message to signify robot waiting;
+        telemetry.addData("Say", "Hello Driver");    //
+        telemetry.update();
 
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
 
+        // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            telemetry.addData("Twister", "POS: " + robot.liftMech.twister.getPosition());
-            telemetry.addData("Grabber", "POS: " + + robot.liftMech.grabber.getPosition());
+          // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
+        robot.setPower4WDrive(gamepad1.left_stick_y,gamepad1.right_stick_y, gamepad1.left_stick_y, gamepad1.right_stick_y );
 
+        if (gamepad1.right_trigger > 0){
 
+            telemetry.addData("Right trigger pressed.", gamepad1.right_trigger);
 
             // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
-            if (gamepad1.left_stick_y > 0){
-                left_stick_speed = -(gamepad1.left_stick_y * gamepad1.left_stick_y);
-            }else if (gamepad1.left_stick_y < 0){
-                left_stick_speed = gamepad1.left_stick_y * gamepad1.left_stick_y;
-            }else{
-                left_stick_speed = 0;
-            }
-
-            if (gamepad1.right_stick_y > 0){
-                right_stick_speed = -(gamepad1.right_stick_y * gamepad1.right_stick_y);
-            } else if(gamepad1.right_stick_y < 0){
-                right_stick_speed = gamepad1.right_stick_y * gamepad1.right_stick_y;
-            } else{
-                right_stick_speed = 0;
-            }
-
-            robot.setPower4WDrive(left_stick_speed, right_stick_speed, left_stick_speed, right_stick_speed);
-
-            if (gamepad1.right_trigger > 0) {
-
-                telemetry.addData("Right trigger pressed.", gamepad1.right_trigger);
-
-                // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
-                //robot.setPower4WDrive(-gamepad1.right_trigger, gamepad1.right_trigger, gamepad1.right_trigger, -gamepad1.right_trigger);
-                //robot.setPower4WDrive(-gamepad1.left_trigger, gamepad1.left_trigger, gamepad1.left_trigger, -gamepad1.left_trigger);
-
-                robot.setPower4WDrive(gamepad1.right_trigger, -gamepad1.right_trigger, -gamepad1.right_trigger, gamepad1.right_trigger );
+            robot.setPower4WDrive(gamepad1.right_trigger, -gamepad1.right_trigger, -gamepad1.right_trigger, gamepad1.right_trigger );
 
 
-            } else if (gamepad1.left_trigger > 0) {
+        }
+        else if (gamepad1.left_trigger > 0 ) {
 
-                telemetry.addData("Left trigger pressed.", gamepad1.left_trigger);
+            telemetry.addData("Left trigger pressed.", gamepad1.left_trigger);
 
-                // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
-                //robot.setPower4WDrive(gamepad1.left_trigger, -gamepad1.left_trigger, -gamepad1.left_trigger, gamepad1.left_trigger);
-                robot.setPower4WDrive(-gamepad1.left_trigger, gamepad1.left_trigger, gamepad1.left_trigger, -gamepad1.left_trigger);
+            // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
+            robot.setPower4WDrive(-gamepad1.left_trigger, gamepad1.left_trigger, gamepad1.left_trigger, -gamepad1.left_trigger);
 
-            }
+        }
+
 
             //gamepad 1 ends here
 
@@ -235,7 +211,7 @@ public class SkylerTeleop extends LinearOpMode {
                 robot.liftMech.grabber.setPosition(robot.liftMech.GRABBER_RELEASE_POSITION); //0.15
                 //robot.liftMech.grabber.setPosition(1.0);
             } else if(gamepad2.right_stick_x > 0 ){
-                robot.liftMech.twister.setPosition(robot.liftMech.GRABBER_RELEASE_POSITION);
+                robot.liftMech.twister.setPosition(robot.liftMech.TWISTER_DELIVER_POSITION);
             }
 
             //Grab
@@ -249,25 +225,9 @@ public class SkylerTeleop extends LinearOpMode {
 
 
 
-
         // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.update();
-        }
-
-
-        public void initialize(){
-            robot.liftMech.twister.setPosition(1.0);
-            robot.liftMech.grabber.setPosition(0.15);
-            robot.frontArm.stop();
-            robot.backArm.stop();
-            robot.hookLatch.stop();
-            telemetry.addData("Status", "Initialized");
-            telemetry.update();
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.update();
 
         }
-
-
     }
-
-

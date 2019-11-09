@@ -99,6 +99,7 @@ public class ServoTest extends BasicAuton {
 
         if (opModeIsActive()) {
 
+            /*
             long waitTime = 10000;
             telemetry.addData("grabber (initial)", " pos:  " + robot.liftMech.grabber.getPosition());
             telemetry.update();
@@ -208,6 +209,8 @@ public class ServoTest extends BasicAuton {
 
             robot.linearMove(robot.LEFT,0.45,35);
             sleep(3000);
+
+
 */
 
 

@@ -16,9 +16,9 @@ public class LiftMech {
     public final int DOWN = 2;
     public double STOP_SPEED = 0.0;
     public double DOWN_SPEED = 0.1;
-    public double GRABBER_LOCK_POSITION = 0.90;
-    public double GRABBER_RELEASE_POSITION = 0.2;
-    public double TWISTER_HOME_POSITION = 1.0;
+    public double GRABBER_LOCK_POSITION = 0.90; //
+    public double GRABBER_RELEASE_POSITION = 0.4; // 0.2
+    public double TWISTER_HOME_POSITION = 1.0; //
     public double TWISTER_DELIVER_POSITION = 0.25;
 
 
@@ -28,8 +28,8 @@ public class LiftMech {
         liftElevator = parentHwMap.get(DcMotor.class, "liftElevator");
         grabber = parentHwMap.get(Servo.class, "grabber");
         twister= parentHwMap.get(Servo.class, "twister");
-        grabber.setPosition(1.0);
-        twister.setPosition(0.0);
+        grabber.setPosition(GRABBER_RELEASE_POSITION);
+        twister.setPosition(TWISTER_HOME_POSITION);
         //grabber.setDirection(DcMotorSimple.Direction.REVERSE);
         //twister.setDirection(DcMotorSimple.Direction.FORWARD);
 
