@@ -57,7 +57,7 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
     double right_stick_speed;
     double left_stick_speed;
     boolean elevatorLock = false;
-    boolean initialized = false;
+    boolean hooksLatched = false;
 
 
     @Override
@@ -103,7 +103,7 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
             // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
             //robot.setPower4WDrive(-gamepad1.left_trigger, gamepad1.left_trigger, gamepad1.left_trigger, -gamepad1.left_trigger); // ORIG
-            robot.setPower4WDrive(-gamepad1.left_trigger, gamepad1.left_trigger, gamepad1.left_trigger, -gamepad1.left_trigger);
+            robot.setPower4WDrive(gamepad1.left_trigger, -gamepad1.left_trigger, -gamepad1.left_trigger, gamepad1.left_trigger);
 
 
 
@@ -127,26 +127,22 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
 
             //hooks
-            if(gamepad1.dpad_up){
+            if(gamepad1.dpad_up || hooksLatched){
 
-
+                hooksLatched = true;
                 robot.hookLatch.latch();
                 telemetry.addData("dPad Up", " " + gamepad2.dpad_up);
                 telemetry.update();
 
 
-            } else if (gamepad1.dpad_down){
-
+            }
+            if (gamepad1.dpad_down || !hooksLatched){
+                hooksLatched = false;
                 robot.hookLatch.release();
                 telemetry.addData("dPad Down", " " + gamepad2.dpad_down);
                 telemetry.update();
 
-            } else{
 
-                //robot.hookLatch.stop();
-                telemetry.addData(" both down ", " " + gamepad2.dpad_down);
-                telemetry.addData(" both up", " " + gamepad2.dpad_up);
-                telemetry.update();
             }
 
 
@@ -158,26 +154,23 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
             //gamepad 2 starts here
 
             //hooks
-            if(gamepad2.dpad_up){
+            if(gamepad2.dpad_up || hooksLatched){
 
 
                 robot.hookLatch.latch();
                 telemetry.addData("dPad Up", " " + gamepad2.dpad_up);
                 telemetry.update();
+                hooksLatched = true;
 
 
-            } else if (gamepad2.dpad_down){
+            }
+            if (gamepad2.dpad_down || !hooksLatched){
 
                 robot.hookLatch.release();
                 telemetry.addData("dPad Down", " " + gamepad2.dpad_down);
                 telemetry.update();
+                hooksLatched = false;
 
-            } else{
-
-                //robot.hookLatch.stop();
-                telemetry.addData(" both down ", " " + gamepad2.dpad_down);
-                telemetry.addData(" both up", " " + gamepad2.dpad_up);
-                telemetry.update();
             }
 
 
@@ -266,8 +259,11 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
             //if (gamepad2.right_stick_y > 0) robot.liftMech.grabber.setPosition(0.90);//0.85
             //if(gamepad2.right_stick_y < 0 ) robot.liftMech.grabber.setPosition(0.08); //0.15
 
-            telemetry.addData("twistLift rightStickX", " " + gamepad2.right_stick_x);
-            telemetry.update();
+            //telemetry.addData("twistLift rightStickX", " " + gamepad2.right_stick_x);
+            //telemetry.update();
+
+            //telemetry.addData("current Position", "L: "+robot.hookLatch.hookLeft.getPosition()+" R:"+robot.hookLatch.hookRight.getPosition());    //
+            //telemetry.update();
 
         }
 
