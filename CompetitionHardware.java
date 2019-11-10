@@ -74,6 +74,7 @@ public class CompetitionHardware
     public boolean hasArm = true;
     public boolean activateSpeedProfile = false;
     public Hooks hookLatch = null;
+    //public ServoHooks hookLatch = null;
     public IntakeMech intakeMech = null;
     public LiftMech liftMech = null;
     public Arm frontArm = null;
@@ -497,6 +498,42 @@ public class CompetitionHardware
 
     }
 
+    public int linearMoveOne (DcMotor testMotor, int direction,double speed, double distance) {
 
+        int testTarget;
+        testMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        // Determine new target position, and pass to motor controller
+        testTarget = testMotor.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
+
+
+
+
+        testMotor.setTargetPosition(testTarget);
+
+
+        // Turn On RUN_TO_POSITION
+        testMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+        if (!activateSpeedProfile) {
+
+            //Setting the power
+            testMotor.setPower(Math.abs(speed));
+
+            while (testMotor.isBusy() ) {
+                // just waiting when motors are busy
+            }
+
+        }
+
+        // Stop all motion
+        testMotor.setPower(0.0);
+        //setEncoder(true);
+
+        return testTarget;
+
+    }
 
 }

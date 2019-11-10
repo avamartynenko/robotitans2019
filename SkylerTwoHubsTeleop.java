@@ -82,14 +82,18 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
         while (opModeIsActive()) {
 
           // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
-        robot.setPower4WDrive(gamepad1.left_stick_y,gamepad1.right_stick_y, gamepad1.left_stick_y, gamepad1.right_stick_y );
+        //robot.setPower4WDrive(gamepad1.left_stick_y,gamepad1.right_stick_y, gamepad1.left_stick_y, gamepad1.right_stick_y ); // ORIG
+            robot.setPower4WDrive(-gamepad1.left_stick_y,-gamepad1.right_stick_y, -gamepad1.left_stick_y, -gamepad1.right_stick_y );
 
-        if (gamepad1.right_trigger > 0){
+
+            if (gamepad1.right_trigger > 0){
 
             telemetry.addData("Right trigger pressed.", gamepad1.right_trigger);
 
             // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
-            robot.setPower4WDrive(gamepad1.right_trigger, -gamepad1.right_trigger, -gamepad1.right_trigger, gamepad1.right_trigger );
+            //robot.setPower4WDrive(gamepad1.right_trigger, -gamepad1.right_trigger, -gamepad1.right_trigger, gamepad1.right_trigger ); // ORIG
+            robot.setPower4WDrive(-gamepad1.right_trigger, gamepad1.right_trigger, gamepad1.right_trigger, -gamepad1.right_trigger );
+
 
 
         }
@@ -98,9 +102,53 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
             telemetry.addData("Left trigger pressed.", gamepad1.left_trigger);
 
             // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
+            //robot.setPower4WDrive(-gamepad1.left_trigger, gamepad1.left_trigger, gamepad1.left_trigger, -gamepad1.left_trigger); // ORIG
             robot.setPower4WDrive(-gamepad1.left_trigger, gamepad1.left_trigger, gamepad1.left_trigger, -gamepad1.left_trigger);
 
-        }
+
+
+            }
+
+
+
+            //intake motors
+            if (gamepad1.left_bumper) {
+
+                robot.intakeMech.run(-robot.intakeMech.INTAKE_SPEED);
+
+            } else if (gamepad1.right_bumper){
+
+                robot.intakeMech.run(robot.intakeMech.INTAKE_SPEED);
+
+            } else{
+
+                robot.intakeMech.stop();
+            }
+
+
+            //hooks
+            if(gamepad1.dpad_up){
+
+
+                robot.hookLatch.latch();
+                telemetry.addData("dPad Up", " " + gamepad2.dpad_up);
+                telemetry.update();
+
+
+            } else if (gamepad1.dpad_down){
+
+                robot.hookLatch.release();
+                telemetry.addData("dPad Down", " " + gamepad2.dpad_down);
+                telemetry.update();
+
+            } else{
+
+                //robot.hookLatch.stop();
+                telemetry.addData(" both down ", " " + gamepad2.dpad_down);
+                telemetry.addData(" both up", " " + gamepad2.dpad_up);
+                telemetry.update();
+            }
+
 
 
             //gamepad 1 ends here
@@ -165,9 +213,9 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
             //intake motors
             if (gamepad2.left_trigger > 0){
-                robot.intakeMech.run(gamepad2.left_trigger);
+                robot.intakeMech.run(-robot.intakeMech.INTAKE_SPEED);
             } else if(gamepad2.right_trigger > 0) {
-                robot.intakeMech.run(-gamepad2.right_trigger);
+                robot.intakeMech.run(robot.intakeMech.INTAKE_SPEED);
             } else{
 
                 robot.intakeMech.stop();

@@ -11,7 +11,7 @@ public class Hooks {
     HardwareMap hwMap =  null;
     public final int DOWN = 1;
     public final int UP = 2;
-    public double LATCH_SPEED = 0.3;
+    public double LATCH_SPEED = 0.7;
     public double STOP_SPEED = 0.0;
 
 
