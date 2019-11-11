@@ -14,8 +14,8 @@ public class LiftMech {
     HardwareMap hwMap =  null;
     public final int UP = 1;
     public final int DOWN = 2;
-    public double STOP_SPEED = 0.0;
-    public double DOWN_SPEED = 0.1;
+    public double UP_SPEED = 0.0;
+    public double DOWN_SPEED = 0.5;
     public double GRABBER_LOCK_POSITION = 0.90; //
     public double GRABBER_RELEASE_POSITION = 0.4; // 0.2
     public double TWISTER_HOME_POSITION = 1.0; //
@@ -55,7 +55,7 @@ public class LiftMech {
     public void runElevator(double speed){
 
         if(speed >= 0) {
-            liftElevator.setPower(speed);
+            liftElevator.setPower(UP_SPEED);
         } else {
             liftElevator.setPower(DOWN_SPEED);
         }

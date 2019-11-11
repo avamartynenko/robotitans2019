@@ -261,7 +261,7 @@ public class SkylerTeleop extends LinearOpMode {
             robot.liftMech.grabber.setPosition(0.15);
             robot.frontArm.stop();
             robot.backArm.stop();
-            robot.hookLatch.stop();
+            //robot.hookLatch.stop();
             telemetry.addData("Status", "Initialized");
             telemetry.update();
 

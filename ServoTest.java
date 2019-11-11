@@ -100,8 +100,12 @@ public class ServoTest extends LinearOpMode{
 
         if (opModeIsActive()) {
 
-
-            //ro
+// Send telemetry message to signify robot waiting;
+            //telemetry.addData("current Position", "L: "+robot.hookLatch.hookLeft.getPosition()+" R:"+robot.hookLatch.hookRight);    //
+            //telemetry.update();
+            robot.hookLatch.latch();
+            //telemetry.addData("current Position", "L: "+robot.hookLatch.hookLeft.getPosition()+" R:"+robot.hookLatch.hookRight.getPosition());    //
+            //telemetry.update();
 
 
 

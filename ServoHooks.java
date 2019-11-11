@@ -13,7 +13,7 @@ public class ServoHooks {
     public double LEFT_HOOK_LATCH_POSITION = 0.5;
     public double RIGHT_HOOK_LATCH_POSITION = 0.2;
 
-    public double LEFT_HOOK_HOME_POSITION = 0.2;
+    public double LEFT_HOOK_HOME_POSITION = 0.5;
     public double RIGHT_HOOK_HOME_POSITION = 0.5;
 
 

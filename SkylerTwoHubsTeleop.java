@@ -58,7 +58,7 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
     double left_stick_speed;
     boolean elevatorLock = false;
     boolean hooksLatched = false;
-    public double SENSITIVITY_DRIVE = 0.5;
+    public double SENSITIVITY_DRIVE = 0.8;
 
 
     @Override
@@ -131,39 +131,19 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
 
             //intake motors
-            if (gamepad1.left_bumper) {
-
-                robot.intakeMech.run(-robot.intakeMech.INTAKE_SPEED);
-
-            } else if (gamepad1.right_bumper){
-
-                robot.intakeMech.run(robot.intakeMech.INTAKE_SPEED);
-
-            } else{
-
-                robot.intakeMech.stop();
-            }
-
-
-            //hooks
-            if(gamepad1.dpad_up || hooksLatched){
+            if (gamepad1.left_bumper || hooksLatched) {
 
                 hooksLatched = true;
                 robot.hookLatch.latch();
-                telemetry.addData("dPad Up", " " + gamepad2.dpad_up);
-                telemetry.update();
-
 
             }
-            if (gamepad1.dpad_down || !hooksLatched){
+
+            if (gamepad1.right_bumper||!hooksLatched){
+
                 hooksLatched = false;
                 robot.hookLatch.release();
-                telemetry.addData("dPad Down", " " + gamepad2.dpad_down);
-                telemetry.update();
-
 
             }
-
 
 
             //gamepad 1 ends here
@@ -171,27 +151,6 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
 
             //gamepad 2 starts here
-
-            //hooks
-            if(gamepad2.dpad_up || hooksLatched){
-
-
-                robot.hookLatch.latch();
-                telemetry.addData("dPad Up", " " + gamepad2.dpad_up);
-                telemetry.update();
-                hooksLatched = true;
-
-
-            }
-            if (gamepad2.dpad_down || !hooksLatched){
-
-                robot.hookLatch.release();
-                telemetry.addData("dPad Down", " " + gamepad2.dpad_down);
-                telemetry.update();
-                hooksLatched = false;
-
-            }
-
 
 
             //front side auton arm
