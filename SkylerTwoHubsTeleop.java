@@ -58,6 +58,7 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
     double left_stick_speed;
     boolean elevatorLock = false;
     boolean hooksLatched = false;
+    public double SENSITIVITY_DRIVE = 0.5;
 
 
     @Override
@@ -81,9 +82,27 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-          // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
-        //robot.setPower4WDrive(gamepad1.left_stick_y,gamepad1.right_stick_y, gamepad1.left_stick_y, gamepad1.right_stick_y ); // ORIG
-            robot.setPower4WDrive(-gamepad1.left_stick_y,-gamepad1.right_stick_y, -gamepad1.left_stick_y, -gamepad1.right_stick_y );
+            // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
+            if (gamepad1.left_stick_y > 0){
+                left_stick_speed = gamepad1.left_stick_y * gamepad1.left_stick_y;
+            }else if (gamepad1.left_stick_y < 0){
+                left_stick_speed = -(gamepad1.left_stick_y * gamepad1.left_stick_y);
+            }else{
+                left_stick_speed = 0;
+            }
+            left_stick_speed = left_stick_speed * SENSITIVITY_DRIVE;
+
+            if (gamepad1.right_stick_y > 0){
+                right_stick_speed = gamepad1.right_stick_y * gamepad1.right_stick_y;
+            } else if(gamepad1.right_stick_y < 0){
+                right_stick_speed = -(gamepad1.right_stick_y * gamepad1.right_stick_y);
+            } else{
+                right_stick_speed = 0;
+            }
+            right_stick_speed = right_stick_speed * SENSITIVITY_DRIVE;
+
+            robot.setPower4WDrive(-left_stick_speed, -right_stick_speed, -left_stick_speed, -right_stick_speed);
+
 
 
             if (gamepad1.right_trigger > 0){
