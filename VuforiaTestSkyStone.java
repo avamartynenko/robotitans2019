@@ -355,6 +355,7 @@ public class VuforiaTestSkyStone extends BasicAuton {
             // Provide feedback as to where the robot is located (if we know).
             if (targetVisible) {
 
+                robot.linearMove(robot.RIGHT,0.3,10);
                 pickUpSkyStone();
 
                 // express position (translation) of robot in inches.
