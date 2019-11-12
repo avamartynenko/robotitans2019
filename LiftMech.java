@@ -55,7 +55,7 @@ public class LiftMech {
     public void runElevator(double speed){
 
         if(speed >= 0) {
-            liftElevator.setPower(UP_SPEED);
+            liftElevator.setPower(speed);
         } else {
             liftElevator.setPower(DOWN_SPEED);
         }

@@ -30,9 +30,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
@@ -61,91 +58,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="ServoTest", group="Pushbot")
+@Autonomous(name="PullFoundationBlue", group="Pushbot")
 //@Disabled
-public class ServoTest extends LinearOpMode{
+public class PullFoundationBlue extends PullFoundationRed {
 
-    /* Declare OpMode members. */
-    CompetitionHardware robot = new CompetitionHardware();   // Use a Pushbot's hardware
-    private ElapsedTime runtime = new ElapsedTime();
-
-    static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
-    static final double DRIVE_GEAR_REDUCTION = 2.0;     // This is < 1.0 if geared UP
-    static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
-    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double DRIVE_SPEED = 0.6;
-    static final double TURN_SPEED = 0.5;
-
-
-    @Override
-    public void runOpMode() {
-
-        /*
-         * Initialize the drive system variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap, true, false, true);
-        //super.initialize();
-        //robot.initTeleopModules();
-
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "init");    //
-        telemetry.update();
-
-
-
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-
-        if (opModeIsActive()) {
-
-// Send telemetry message to signify robot waiting;
-            //telemetry.addData("current Position", "L: "+robot.hookLatch.hookLeft.getPosition()+" R:"+robot.hookLatch.hookRight);    //
-            //telemetry.update();
-            //robot.hookLatch.latch();
-            //telemetry.addData("current Position", "L: "+robot.hookLatch.hookLeft.getPosition()+" R:"+robot.hookLatch.hookRight.getPosition());    //
-            //telemetry.update();
-
-            robot.hookLatch.latch();
-            sleep(3000);
-            robot.linearMove(robot.LEFT, 0.5,100);
-            robot.hookLatch.latch();
-            sleep(30000);
-
-
-
-
-
-           /* robot.linearMove(robot.FORWARD,0.25,5);
-            robot.linearMove(robot.REVERSE,0.25,5);
-            robot.linearMove(robot.RIGHT,0.25,5);
-            robot.linearMove(robot.LEFT,0.25,5);
-            robot.gyroMove(robot.GYRO_RIGHT,0.24,90);
-            robot.gyroMove(robot.GYRO_LEFT,0.24,90);
-
-            */
-
-            //robot.linearMoveOne(robot.frontLeft,robot.FORWARD,0.25,5);
-            //robot.linearMoveOne(robot.intakeMech.intakeRight,robot.FORWARD,0.25,5);
-
-
-           /*
-            robot.linearMove(robot.REVERSE,0.25,5);
-            robot.linearMove(robot.LEFT,0.25,5);
-            robot.linearMove(robot.RIGHT,0.25,5);
-            robot.gyroMove(robot.GYRO_LEFT,0.25,90);
-            robot.gyroMove(robot.GYRO_RIGHT,0.25,90);
-            */
-
-        }
-
+    public PullFoundationBlue(){
+        super.setAllianceColor(BasicAuton.GAME_ALLIANCE_BLUE);
     }
-
-
-
-
-
-
 
 }

@@ -103,6 +103,23 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
             robot.setPower4WDrive(-left_stick_speed, -right_stick_speed, -left_stick_speed, -right_stick_speed);
 
+            double slowspeed = 0.4;
+            if(gamepad1.dpad_down){
+                robot.setPower4WDrive(-slowspeed, -slowspeed, -slowspeed, -slowspeed);
+            }
+            if(gamepad1.dpad_up){
+                robot.setPower4WDrive(slowspeed, slowspeed, slowspeed, slowspeed);
+            }
+            if (gamepad1.dpad_left){
+                robot.setPower4WDrive(slowspeed, -slowspeed, -slowspeed, slowspeed);
+            }
+            if (gamepad1.dpad_right){
+                robot.setPower4WDrive(-slowspeed, slowspeed, slowspeed, -slowspeed );
+            }
+
+
+
+
 
 
             if (gamepad1.right_trigger > 0){
@@ -196,6 +213,11 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
             //elevator
             robot.liftMech.runElevator(-gamepad2.left_stick_y);
+
+            if(gamepad2.left_stick_y>0 || gamepad2.left_stick_y<0){
+                telemetry.addData("Lift Ele", " " + -gamepad2.left_stick_y);
+                telemetry.update();
+            }
 
             if(gamepad2.back){
                 if(elevatorLock) {
