@@ -384,9 +384,15 @@ public class VuforiaTestSkyStone extends BasicAuton {
             telemetry.update();
             pickupSkystone();
         }
-
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
+
+        deliverStone();
+
+        goForSecondStone();
+
+        parkUnderTheBridge();
+
     }
 
     public void pickupSkystone(){
@@ -396,5 +402,16 @@ public class VuforiaTestSkyStone extends BasicAuton {
         pickUpSkyStone();
     }
 
+    public void deliverStone(){
+
+    }
+
+    public void goForSecondStone(){
+
+    }
+
+    public void parkUnderTheBridge(){
+
+    }
 
 }
