@@ -11,7 +11,7 @@ public class IntakeMech {
     HardwareMap hwMap =  null;
     public final int OUT = 1;
     public final int IN = 2;
-    public double INTAKE_SPEED = 0.3;
+    public double INTAKE_SPEED = 0.7;
     public double STOP_SPEED = 0.0;
 
 

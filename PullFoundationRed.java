@@ -30,9 +30,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
@@ -61,91 +58,42 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="ServoTest", group="Pushbot")
+@Autonomous(name="PullFoundationRed", group="Pushbot")
 //@Disabled
-public class ServoTest extends LinearOpMode{
-
-    /* Declare OpMode members. */
-    CompetitionHardware robot = new CompetitionHardware();   // Use a Pushbot's hardware
-    private ElapsedTime runtime = new ElapsedTime();
-
-    static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
-    static final double DRIVE_GEAR_REDUCTION = 2.0;     // This is < 1.0 if geared UP
-    static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
-    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double DRIVE_SPEED = 0.6;
-    static final double TURN_SPEED = 0.5;
-
+public class PullFoundationRed extends BasicAuton {
 
     @Override
     public void runOpMode() {
 
+        // refresh competition hardware, arm. hook
+        // code is in servotest class
+        super.initialize();
         /*
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-        robot.init(hardwareMap, true, false, true);
-        //super.initialize();
-        //robot.initTeleopModules();
+        //robot.init(hardwareMap, true, false, true);
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "init");    //
+        telemetry.addData("Status", "init AutonTestEx");    //
         telemetry.update();
-
-
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        if (opModeIsActive()) {
 
-// Send telemetry message to signify robot waiting;
-            //telemetry.addData("current Position", "L: "+robot.hookLatch.hookLeft.getPosition()+" R:"+robot.hookLatch.hookRight);    //
-            //telemetry.update();
-            //robot.hookLatch.latch();
-            //telemetry.addData("current Position", "L: "+robot.hookLatch.hookLeft.getPosition()+" R:"+robot.hookLatch.hookRight.getPosition());    //
-            //telemetry.update();
-
+        if (opModeIsActive())
+        {
+            robot.linearMove(robot.LEFT,0.6,11);
+            robot.linearMove(robot.REVERSE,0.6,32);
             robot.hookLatch.latch();
-            sleep(3000);
-            robot.linearMove(robot.LEFT, 0.5,100);
-            robot.hookLatch.latch();
-            sleep(30000);
+            telemetry.addData("Status", "latched on");    //
+            telemetry.update();
+            sleep(1000);
+            robot.linearMove(robot.FORWARD,0.3,38);
+            robot.hookLatch.release();
+            robot.linearMove(robot.RIGHT,0.6,55);
 
-
-
-
-
-           /* robot.linearMove(robot.FORWARD,0.25,5);
-            robot.linearMove(robot.REVERSE,0.25,5);
-            robot.linearMove(robot.RIGHT,0.25,5);
-            robot.linearMove(robot.LEFT,0.25,5);
-            robot.gyroMove(robot.GYRO_RIGHT,0.24,90);
-            robot.gyroMove(robot.GYRO_LEFT,0.24,90);
-
-            */
-
-            //robot.linearMoveOne(robot.frontLeft,robot.FORWARD,0.25,5);
-            //robot.linearMoveOne(robot.intakeMech.intakeRight,robot.FORWARD,0.25,5);
-
-
-           /*
-            robot.linearMove(robot.REVERSE,0.25,5);
-            robot.linearMove(robot.LEFT,0.25,5);
-            robot.linearMove(robot.RIGHT,0.25,5);
-            robot.gyroMove(robot.GYRO_LEFT,0.25,90);
-            robot.gyroMove(robot.GYRO_RIGHT,0.25,90);
-            */
 
         }
-
     }
-
-
-
-
-
-
-
 }

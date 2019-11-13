@@ -156,14 +156,14 @@ public class BasicAuton extends LinearOpMode {
 
     public void pickUpSkyStone () {
 
-        choiceOfArm.goDown(0.1);
-        sleep(3000);
+        choiceOfArm.goDown(0.5);
+        sleep(1000);
 
         choiceOfArm.latchStone(0.5);
-        sleep(3000);
+        sleep(1000);
 
-        choiceOfArm.liftUp(0.1);
-        sleep(3000);
+        choiceOfArm.liftUp(0.5);
+        sleep(1000);
 
 
     }
