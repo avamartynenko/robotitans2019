@@ -68,7 +68,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  */
 
 @TeleOp(name="VuforiaTest", group ="Concept")
-//@Disabled
+@Disabled
 public class VuforiaTest extends LinearOpMode {
 
     public static final String TAG = "Vuforia VuMark Sample";

@@ -51,7 +51,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="SkylerTeleop", group="Linear Opmode")
-//@Disabled
+@Disabled
 public class SkylerTeleop extends LinearOpMode {
 
     // Declare OpMode members.

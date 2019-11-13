@@ -141,6 +141,8 @@ public class VuforiaTestSkyStone extends BasicAuton {
     private float phoneXRotate    = 0;
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
+    private int targetPostion = 0;
+
 
     @Override public void runOpMode() {
 
@@ -330,50 +332,69 @@ public class VuforiaTestSkyStone extends BasicAuton {
 
         targetsSkyStone.activate();
 
-        robot.linearMove(robot.RIGHT,0.3,20);
-        while (!isStopRequested()) {
+        robot.linearMove(robot.FORWARD,0.3,6);
+        robot.linearMove(robot.RIGHT,0.3,18.5);
+        sleep(2000);
 
+        if (opModeIsActive()) {
 
+            while(targetPostion<=1) {
+                // check all the trackable targets to see which one (if any) is visible.
+                targetVisible = false;
+                for (VuforiaTrackable trackable : allTrackables) {
+                    if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                        telemetry.addData("Visible Target", trackable.getName());
+                        targetVisible = true;
 
-            // check all the trackable targets to see which one (if any) is visible.
-            targetVisible = false;
-            for (VuforiaTrackable trackable : allTrackables) {
-                if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
-                    telemetry.addData("Visible Target", trackable.getName());
-                    targetVisible = true;
-
-                    // getUpdatedRobotLocation() will return null if no new information is available since
-                    // the last time that call was made, or if the trackable is not currently visible.
-                    OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
-                    if (robotLocationTransform != null) {
-                        lastLocation = robotLocationTransform;
+                        // getUpdatedRobotLocation() will return null if no new information is available since
+                        // the last time that call was made, or if the trackable is not currently visible.
+                        OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
+                        if (robotLocationTransform != null) {
+                            lastLocation = robotLocationTransform;
+                        }
+                        break;
                     }
-                    break;
                 }
+
+                // Provide feedback as to where the robot is located (if we know).
+                if (targetVisible) {
+
+                    // express position (translation) of robot in inches.
+                    VectorF translation = lastLocation.getTranslation();
+                    telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+                            translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+
+                    // express the rotation of the robot in degrees.
+                    Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+                    telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+                    break;
+
+                } else {
+                    targetPostion++;
+                    telemetry.addData("Visible Target", "none");
+                    robot.linearMove(robot.REVERSE, 0.3, 7.5);
+                    sleep(2000);
+
+                }
+
+                telemetry.update();
             }
+            telemetry.addData("Target Position::", targetPostion);
 
-            // Provide feedback as to where the robot is located (if we know).
-            if (targetVisible) {
-
-                robot.linearMove(robot.RIGHT,0.3,10);
-                pickUpSkyStone();
-
-                // express position (translation) of robot in inches.
-                VectorF translation = lastLocation.getTranslation();
-                telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
-                        translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
-
-                // express the rotation of the robot in degrees.
-                Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
-            }
-            else {
-                telemetry.addData("Visible Target", "none");
-            }
             telemetry.update();
+            pickupSkystone();
         }
 
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
     }
+
+    public void pickupSkystone(){
+
+        robot.linearMove(robot.REVERSE, 0.3, 5);
+        robot.linearMove(robot.RIGHT, 0.3, 10);
+        pickUpSkyStone();
+    }
+
+
 }

@@ -51,7 +51,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  */
 
 @TeleOp(name="TeleopSylerOnlyWheels", group="Pushbot")
-//@Disabled
+@Disabled
 public class TeleopSylerOnlyWheels extends LinearOpMode {
 
     /* Declare OpMode members. */
