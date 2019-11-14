@@ -173,11 +173,11 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
             //front side auton arm
             if(gamepad2.y){
 
-                robot.frontArm.liftUp(0.4);
+                robot.frontArm.liftUp(0.8);
             }
             else if(gamepad2.a){
 
-                robot.frontArm.goDown(0.4);
+                robot.frontArm.goDown(0.8);
             }
             else {
 
@@ -187,11 +187,11 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
             if(gamepad2.x){
 
-                robot.frontArm.releaseStone(0.4);
+                robot.frontArm.releaseStone(0.8);
             }
             else if(gamepad2.b){
 
-                robot.frontArm.latchStone(0.4);
+                robot.frontArm.latchStone(0.8);
             }
             else{
 
