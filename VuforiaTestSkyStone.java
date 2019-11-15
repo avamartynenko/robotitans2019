@@ -150,7 +150,7 @@ public class VuforiaTestSkyStone extends BasicAuton {
     private double slowMoSpeed = .4;
     private int sleepTime = 100;
     private int detectionWaitTime = 2000;
-    private int latchTime = 1000;
+    private int latchTime = 1250;
 
 
     @Override public void runOpMode() {
@@ -389,14 +389,14 @@ public class VuforiaTestSkyStone extends BasicAuton {
             telemetry.addData("Target Position::", targetPostion);
 
             telemetry.update();
-            repositionAndPickupSkystone();
         }
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
+        repositionAndPickupSkystone();
 
         deliverStone();
 
-        goForSecondStone();
+        //goForSecondStone();
 
         parkUnderTheBridge();
     }
@@ -405,11 +405,17 @@ public class VuforiaTestSkyStone extends BasicAuton {
 
         robot.linearMove(robot.REVERSE, slowMoSpeed, 5);
         robot.linearMove(robot.RIGHT, slowMoSpeed, 8);
-        pickUpSkyStone();
+        //pickUpSkyStone();
+        choiceOfArm.latchStone(1.0);
+        choiceOfArm.goDown(1.0);
+        sleep(2000);
+        //robot.linearMove(robot.RIGHT, slowMoSpeed, 4);
+        choiceOfArm.liftUp(1.0);
     }
 
     public void deliverStone(){
         robot.linearMove(robot.LEFT, slowMoSpeed, safeDistanceOffset);
+        sleep(750);
         double initialOffset = 8 * (2 - targetPostion); // stone dimentions are 8x4x5
         robot.linearMove(robot.REVERSE, MAX_SPEED, dropZoneOffset - 16 + initialOffset);
         robot.linearMove(robot.RIGHT, slowMoSpeed, 4);
@@ -419,13 +425,13 @@ public class VuforiaTestSkyStone extends BasicAuton {
         //dropCube();  // basic auton will get the proper arm by its self
 
         // pullback and rotate
-        linearMoveWrapper(robot.LEFT, MAX_SPEED*0.6, 4);
+        linearMoveWrapper(robot.LEFT, MAX_SPEED*0.6, 3);
         //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
-        robot.gyroMove(robot.GYRO_LEFT, MAX_SPEED*0.8,90);
+        robot.gyroMove(robot.GYRO_LEFT, MAX_SPEED*0.8,75);
 
         reOrient();  // will change orientation based on alliance color
 
-        linearMoveWrapper(robot.REVERSE, MAX_SPEED*0.3, 5);
+        linearMoveWrapper(robot.REVERSE, slowMoSpeed, 10);
 
         // Grab and pull the platform
         robot.hookLatch.latch();
@@ -433,19 +439,18 @@ public class VuforiaTestSkyStone extends BasicAuton {
 
         // pull platform back
         //linearMoveWrapper(robot.FORWARD, 32, false);
-        linearMoveWrapper(robot.FORWARD, MAX_SPEED*0.8, 36);
+        linearMoveWrapper(robot.FORWARD, MAX_SPEED, 36);
 
         robot.hookLatch.release();
 
         // push platform to the corner
-        linearMoveWrapper(robot.RIGHT, MAX_SPEED,32);
-        linearMoveWrapper(robot.REVERSE, MAX_SPEED,19);
-        linearMoveWrapper(robot.LEFT, MAX_SPEED,6.5);
+        linearMoveWrapper(robot.RIGHT, MAX_SPEED,37);
+
+        linearMoveWrapper(robot.REVERSE, MAX_SPEED,23);
 
         // retreat and park under the bridge
 
-        linearMoveWrapper(robot.FORWARD, MAX_SPEED,19);
-        linearMoveWrapper(robot.RIGHT, MAX_SPEED,25);
+        linearMoveWrapper(robot.RIGHT, MAX_SPEED,22);
     }
 
     public void goForSecondStone(){
