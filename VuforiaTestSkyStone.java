@@ -43,6 +43,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
+import com.vuforia.CameraDevice;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -142,6 +144,13 @@ public class VuforiaTestSkyStone extends BasicAuton {
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
     private int targetPostion = 0;
+
+    private double safeDistanceOffset = 3;
+    private double dropZoneOffset = 90;
+    private double slowMoSpeed = .4;
+    private int sleepTime = 100;
+    private int detectionWaitTime = 2000;
+    private int latchTime = 1000;
 
 
     @Override public void runOpMode() {
@@ -295,8 +304,7 @@ public class VuforiaTestSkyStone extends BasicAuton {
             phoneYRotate = 90;
         }
 
-
-
+        CameraDevice.getInstance().setFlashTorchMode(true);
 
         // Rotate the phone vertical about the X axis if it's in portrait mode
         if (PHONE_IS_PORTRAIT) {
@@ -332,9 +340,9 @@ public class VuforiaTestSkyStone extends BasicAuton {
 
         targetsSkyStone.activate();
 
-        robot.linearMove(robot.FORWARD,0.3,6);
-        robot.linearMove(robot.RIGHT,0.3,18.5);
-        sleep(2000);
+        robot.linearMove(robot.FORWARD,slowMoSpeed,6);
+        robot.linearMove(robot.RIGHT,slowMoSpeed,18.5);
+        sleep(detectionWaitTime);
 
         if (opModeIsActive()) {
 
@@ -372,9 +380,8 @@ public class VuforiaTestSkyStone extends BasicAuton {
                 } else {
                     targetPostion++;
                     telemetry.addData("Visible Target", "none");
-                    robot.linearMove(robot.REVERSE, 0.3, 7.5);
-                    sleep(2000);
-
+                    robot.linearMove(robot.REVERSE, slowMoSpeed, 8);
+                    sleep(detectionWaitTime);
                 }
 
                 telemetry.update();
@@ -382,7 +389,7 @@ public class VuforiaTestSkyStone extends BasicAuton {
             telemetry.addData("Target Position::", targetPostion);
 
             telemetry.update();
-            pickupSkystone();
+            repositionAndPickupSkystone();
         }
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
@@ -392,26 +399,75 @@ public class VuforiaTestSkyStone extends BasicAuton {
         goForSecondStone();
 
         parkUnderTheBridge();
-
     }
 
-    public void pickupSkystone(){
+    public void repositionAndPickupSkystone(){
 
-        robot.linearMove(robot.REVERSE, 0.3, 5);
-        robot.linearMove(robot.RIGHT, 0.3, 10);
+        robot.linearMove(robot.REVERSE, slowMoSpeed, 5);
+        robot.linearMove(robot.RIGHT, slowMoSpeed, 8);
         pickUpSkyStone();
     }
 
     public void deliverStone(){
+        robot.linearMove(robot.LEFT, slowMoSpeed, safeDistanceOffset);
+        double initialOffset = 8 * (2 - targetPostion); // stone dimentions are 8x4x5
+        robot.linearMove(robot.REVERSE, MAX_SPEED, dropZoneOffset - 16 + initialOffset);
+        robot.linearMove(robot.RIGHT, slowMoSpeed, 4);
 
+        placeSkyStoneOnFoundation();
+
+        //dropCube();  // basic auton will get the proper arm by its self
+
+        // pullback and rotate
+        linearMoveWrapper(robot.LEFT, MAX_SPEED*0.6, 4);
+        //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
+        robot.gyroMove(robot.GYRO_LEFT, MAX_SPEED*0.8,90);
+
+        reOrient();  // will change orientation based on alliance color
+
+        linearMoveWrapper(robot.REVERSE, MAX_SPEED*0.3, 5);
+
+        // Grab and pull the platform
+        robot.hookLatch.latch();
+        sleep(latchTime);
+
+        // pull platform back
+        //linearMoveWrapper(robot.FORWARD, 32, false);
+        linearMoveWrapper(robot.FORWARD, MAX_SPEED*0.8, 36);
+
+        robot.hookLatch.release();
+
+        // push platform to the corner
+        linearMoveWrapper(robot.RIGHT, MAX_SPEED,32);
+        linearMoveWrapper(robot.REVERSE, MAX_SPEED,19);
+        linearMoveWrapper(robot.LEFT, MAX_SPEED,6.5);
+
+        // retreat and park under the bridge
+
+        linearMoveWrapper(robot.FORWARD, MAX_SPEED,19);
+        linearMoveWrapper(robot.RIGHT, MAX_SPEED,25);
     }
 
     public void goForSecondStone(){
+        return;
 
+/*        robot.gyroMove(robot.GYRO_RIGHT, slowMoSpeed, 3);
+        double initialOffset = 8 * (2 - targetPostion); // stone dimentions are 8x4x5
+
+        robot.linearMove(robot.FORWARD, MAX_SPEED, dropZoneOffset+24 -16 + initialOffset);
+        robot.linearMove(robot.RIGHT, slowMoSpeed, safeDistanceOffset);
+
+        pickUpSkyStone();
+
+        robot.linearMove(robot.LEFT, slowMoSpeed, safeDistanceOffset);
+        robot.linearMove(robot.REVERSE, MAX_SPEED, dropZoneOffset+24 -16 + initialOffset);
+        placeSkyStoneOnFoundation();*/
     }
 
     public void parkUnderTheBridge(){
+        return;
 
+        // robot.linearMove(robot.LEFT, slowMoSpeed, safeDistanceOffset);
+        // robot.linearMove(robot.FORWARD, MAX_SPEED, 40);
     }
-
 }
