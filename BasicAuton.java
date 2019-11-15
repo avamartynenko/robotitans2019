@@ -54,6 +54,7 @@ public class BasicAuton extends LinearOpMode {
     public static final int GAME_ALLIANCE_RED = 1000;
     public static final int GAME_ALLIANCE_BLUE = 2000;
 
+
     public int allianceColor = GAME_ALLIANCE_RED;
 
     /*
@@ -68,7 +69,7 @@ public class BasicAuton extends LinearOpMode {
     static final double WALL_OVERRUN = 1; // home much father we run into the wall
     static final double WALL_RECOIL = .5; // how far we pull back from the wall
     static final double START_SPEED = .5; // highest possible speed with no slippage
-    static final double MAX_SPEED = .75;
+    static final double MAX_SPEED = 1.0;
 
 
 
@@ -194,14 +195,14 @@ public class BasicAuton extends LinearOpMode {
 
     public void placeSkyStoneOnFoundation(){
 
-        choiceOfArm.goDown(0.1);
-        sleep(3000);
+        choiceOfArm.goDown(0.9);
+        //sleep(3000);
 
-        choiceOfArm.releaseStone(0.5);
-        sleep(3000);
+        choiceOfArm.releaseStone(0.9);
+        sleep(500);
 
-        choiceOfArm.liftUp(0.1);
-        sleep(3000);
+        choiceOfArm.liftUp(0.9);
+        sleep(1000);
 
     }
 
