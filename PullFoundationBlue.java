@@ -58,11 +58,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="PullFoundationBlue", group="Pushbot")
+@Autonomous(name="BLUE_PullFoundation", group="Pushbot")
 //@Disabled
 public class PullFoundationBlue extends PullFoundationRed {
 
     public PullFoundationBlue(){
+
         super.setAllianceColor(BasicAuton.GAME_ALLIANCE_BLUE);
     }
 

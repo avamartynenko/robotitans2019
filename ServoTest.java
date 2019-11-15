@@ -107,11 +107,15 @@ public class ServoTest extends LinearOpMode{
             //telemetry.addData("current Position", "L: "+robot.hookLatch.hookLeft.getPosition()+" R:"+robot.hookLatch.hookRight.getPosition());    //
             //telemetry.update();
 
-            robot.hookLatch.latch();
-            sleep(3000);
-            robot.linearMove(robot.LEFT, 0.5,100);
-            robot.hookLatch.latch();
-            sleep(30000);
+            robot.frontArm.goDown(0.9);
+            robot.frontArm.latchStone(0.9);
+
+            sleep(1000);
+
+            //sleep(1000);
+
+            robot.frontArm.liftUp(0.9);
+            sleep(500);
 
 
 

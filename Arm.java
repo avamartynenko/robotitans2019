@@ -63,6 +63,13 @@ public class Arm {
 
     }
 
+    public void moveToHomePosition(){
+
+        liftUp(0.5);
+        releaseStone(0.5);
+
+    }
+
     public void goDown(double power){
 
         dropServo.setPower(0);

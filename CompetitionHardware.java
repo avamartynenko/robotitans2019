@@ -153,6 +153,11 @@ public class CompetitionHardware
         if(needColorSensor) enableColorSensor();
         if(needGyro) enableGyro();
 
+        /// Keep the attachments to home position
+        hookLatch.release();
+        frontArm.moveToHomePosition();
+        backArm.moveToHomePosition();
+
     }
 
     public void initTeleopModules(){

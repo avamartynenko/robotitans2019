@@ -58,7 +58,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="PullFoundationRed", group="Pushbot")
+@Autonomous(name="RED_PullFoundation", group="Pushbot")
 //@Disabled
 public class PullFoundationRed extends BasicAuton {
 
@@ -83,15 +83,17 @@ public class PullFoundationRed extends BasicAuton {
 
         if (opModeIsActive())
         {
+            reOrient();
             robot.linearMove(robot.LEFT,0.6,11);
             robot.linearMove(robot.REVERSE,0.6,32);
             robot.hookLatch.latch();
+            robot.gyroMove(robot.GYRO_LEFT,0.5,05);
             telemetry.addData("Status", "latched on");    //
             telemetry.update();
             sleep(1000);
             robot.linearMove(robot.FORWARD,0.3,38);
             robot.hookLatch.release();
-            robot.linearMove(robot.RIGHT,0.6,55);
+            robot.linearMove(robot.RIGHT,0.6,60);
 
 
         }
