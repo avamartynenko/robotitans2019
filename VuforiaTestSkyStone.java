@@ -86,7 +86,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@Autonomous(name="VuforiaTestSkyStone", group ="Concept")
+@Autonomous(name="RED_VuforiaTestSkyStone", group ="Concept")
 //@Disabled
 public class VuforiaTestSkyStone extends BasicAuton {
 
@@ -418,7 +418,7 @@ public class VuforiaTestSkyStone extends BasicAuton {
         sleep(750);
         double initialOffset = 8 * (2 - targetPostion); // stone dimentions are 8x4x5
         robot.linearMove(robot.REVERSE, MAX_SPEED, dropZoneOffset - 16 + initialOffset);
-        robot.linearMove(robot.RIGHT, slowMoSpeed, 4);
+        robot.linearMove(robot.RIGHT, slowMoSpeed, 10);
 
         placeSkyStoneOnFoundation();
 

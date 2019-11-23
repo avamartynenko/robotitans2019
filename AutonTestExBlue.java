@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 
 @Autonomous(name="AutonTestExBlue", group="Pushbot")
-//@Disabled
+@Disabled
 public class AutonTestExBlue extends AutonTestEx {
 
     public AutonTestExBlue(){
