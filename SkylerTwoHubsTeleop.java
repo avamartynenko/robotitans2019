@@ -72,9 +72,10 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+
+
             setDriveSpeedAndDirection();
 
             //intake motors
@@ -196,41 +197,81 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
             return;
         }
 
-        double magnitude_base = .5;
+        telemetry.addData("left stick x, y, trigger, btn: ", "%.2f %.2f %.2f %s", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.left_trigger, (gamepad1.left_stick_button ? "on" : "off"));
+        telemetry.addData("right stick x, y, trigger, btn: ", "%.2f %.2f %.2f %s", gamepad1.right_stick_x, gamepad1.right_stick_y, gamepad1.right_trigger, (gamepad1.right_stick_button ? "on" : "off"));
+
+        double magnitude_base = .8;
         double rotation_base = .5;
-        double precision_factor = 2;
+        double precision_divider = 2;
 
         // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
         double x = gamepad1.left_stick_x, y = gamepad1.left_stick_y; // y position needs to be reversed
         double angle = Math.atan2(y, x);
         double magnitude = magnitude_base * Math.sqrt(y * y + x * x);
+        // make angle stick to pi/4
+        double angle_step = Math.toRadians(15); // +- 15 degrees
+        if(Math.abs(angle) <= angle_step)
+            angle = 0;
+        else if(Math.abs(Math.PI/2 - angle) <= angle_step)
+            angle = Math.PI/2;
+        else if(Math.abs(angle + Math.PI/2) <= angle_step)
+            angle = -Math.PI/2;
+        else if(Math.abs(Math.PI - angle) <= angle_step)
+            angle = Math.PI;
+
         double rotation = rotation_base * gamepad1.right_stick_x;
-        telemetry.addData("left stick (x, y)", "%.2f %.2f", x, y);
-        telemetry.addData("left stick: ", "%.2f %.2f", angle, magnitude);
+        telemetry.addData("raw direction angle, magnitude, rotation: ", "%.0f %.2f %.2f", Math.toDegrees(angle), magnitude, rotation);
 
         // slow down with buttons
         if (gamepad1.left_stick_button)
-            magnitude /= precision_factor;
+            magnitude /= precision_divider;
         if (gamepad1.right_stick_button)
-            rotation /= precision_factor;
+            rotation /= precision_divider;
 
-        // accelerate with triggers
-        magnitude += (1 - magnitude_base) * gamepad1.left_trigger;
-        rotation += (1 - rotation_base) * gamepad1.right_trigger;
+        // accelerate turn with right trigger
+        rotation *= (rotation_base + (1-rotation_base)*gamepad1.right_trigger)/rotation_base;
 
-        //magnitude /=4;
+        telemetry.addData("adj direction angle, magnitude, rotation: ", "%.0f %.2f %.2f", Math.toDegrees(angle), magnitude, rotation);
+
         double v1 = magnitude * Math.sin(angle + 3 * Math.PI / 4) + rotation; // fl
         double v2 = magnitude * Math.cos(angle + 3 * Math.PI / 4) - rotation; // fr
         double v3 = magnitude * Math.cos(angle + 3 * Math.PI / 4) + rotation; // bl
         double v4 = magnitude * Math.sin(angle + 3 * Math.PI / 4) - rotation; // br
 
-        // normalize speed
-        double speedFactor = Math.max(Math.max(Math.abs(v1), Math.abs(v2)), Math.max(Math.abs(v3), Math.abs(v4)));
+        telemetry.addData("base v1 v2 v3 v4: ", "%.2f %.2f %.2f %.2f", v1, v2, v3, v4);
 
-        v1 /= Math.abs(speedFactor);
-        v2 /= Math.abs(speedFactor);
-        v3 /= Math.abs(speedFactor);
-        v4 /= Math.abs(speedFactor);
+        // normalize speed
+        double scaleFactor = Math.max(Math.max(Math.abs(v1), Math.abs(v2)), Math.max(Math.abs(v3), Math.abs(v4)));
+
+        // reduce speed with stick button
+        if (gamepad1.left_stick_button)
+            scaleFactor *= precision_divider;
+        if (gamepad1.right_stick_button)
+            scaleFactor *= precision_divider;
+
+        // accelerate with trigger
+        scaleFactor = magnitude_base / Math.abs(scaleFactor);
+        double speedBump = (1 - magnitude_base) * Math.max(gamepad1.left_trigger, gamepad1.right_trigger) * scaleFactor;
+        v1 *= scaleFactor;
+        v1 += v1 * speedBump;
+        v2 *= scaleFactor;
+        v2 += v2 * speedBump;
+        v3 *= scaleFactor;
+        v3 += v3 * speedBump;
+        v4 *= scaleFactor;
+        v4 += speedBump;
+
+        // fix rounding errors
+        scaleFactor = Math.max(Math.max(Math.abs(v1), Math.abs(v2)), Math.max(Math.abs(v3), Math.abs(v4)));
+        if (scaleFactor > 1) {
+            v1 /= scaleFactor;
+            v2 /= scaleFactor;
+            v3 /= scaleFactor;
+            v4 /= scaleFactor;
+        }
+
+        telemetry.addData("norm v1 v2 v3 v4: ", "%.2f %.2f %.2f %.2f", v1, v2, v3, v4);
+        telemetry.update();
 
         // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
         robot.setPower4WDrive(v3, v4, v1, v2);
