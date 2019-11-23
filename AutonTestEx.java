@@ -32,6 +32,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
@@ -61,7 +63,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="AutonTestEx", group="Pushbot")
-//@Disabled
+@Disabled
 public class AutonTestEx extends BasicAuton {
 
     @Override

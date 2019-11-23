@@ -65,8 +65,8 @@ public class Arm {
 
     public void moveToHomePosition(){
 
-        liftUp(0.5);
-        releaseStone(0.5);
+        liftUp(0.1);
+        releaseStone(0.1);
 
     }
 
