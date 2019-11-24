@@ -80,8 +80,6 @@ public class CompetitionHardware
     public Arm frontArm = null;
     public Arm backArm = null;
 
-
-
     public static final double     COUNTS_PER_MOTOR_REV    = 2240 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 0.66 ;     // This is < 1.0 if geared UP
     public final double     COUNTS_PER_MOTOR_REV_WITH_GEAR    = COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION;
@@ -92,29 +90,22 @@ public class CompetitionHardware
 
     public  final double   COUNTS_PER_INCH   = (COUNTS_PER_MOTOR_REV_WITH_GEAR/ WHEEL_CIRCUMFRENCE) * MECHANUM_CPI_RATIO;
 
-
-
-    public final int FORWARD = 1;
-    public final int REVERSE = 2;
-    public final int RIGHT = 3 ;
-    public final int LEFT = 4;
-    public final int GYRO_RIGHT = 5;
-    public final int GYRO_LEFT = 6;
-    public final int DIAGONAL_RIGHT_UP = 7;
-    public final int DIAGONAL_RIGHT_DOWN = 8;
-    public final int DIAGONAL_LEFT_UP = 9;
-    public final int DIAGONAL_LEFT_DOWN = 10;
-
-
-
-
+    public enum Direction {
+        FORWARD,
+        REVERSE,
+        RIGHT,
+        LEFT,
+        GYRO_RIGHT,
+        GYRO_LEFT,
+        DIAGONAL_RIGHT_UP,
+        DIAGONAL_RIGHT_DOWN,
+        DIAGONAL_LEFT_UP,
+        DIAGONAL_LEFT_DOWN
+    };
 
     // variables for using gryo
-    Orientation angles ;
+    Orientation angles;
     BNO055IMU imu;
-
-
-
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -137,22 +128,22 @@ public class CompetitionHardware
         if (hasArm) frontArm = new Arm(hwMap,Arm.FRONT_ARM);
         if (hasArm) backArm = new Arm(hwMap, Arm.BACK_ARM);
 
-
-
         //Sets direction of motors
         backLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         frontLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         backRight.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
         frontRight.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
 
-
         // Set all motors to zero power
         setPower4WDrive(0);
 
         setEncoder(needEncoder);
 
-        if(needColorSensor) enableColorSensor();
-        if(needGyro) enableGyro();
+        if(needColorSensor)
+            enableColorSensor();
+
+        if(needGyro)
+            enableGyro();
 
         /// Keep the attachments to home position
         hookLatch.release();
@@ -161,18 +152,12 @@ public class CompetitionHardware
 
     }
 
-    public void initTeleopModules(){
-
+    public void initTeleopModules() {
         intakeMech = new IntakeMech(hwMap);
         liftMech = new LiftMech(hwMap);
-
-
-
-
     }
 
     public void setEncoder(boolean needEncoder){
-
 
         if (!needEncoder) {
             // Set all motors to run without encoders.
@@ -183,7 +168,8 @@ public class CompetitionHardware
             frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        } else {
+        }
+        else {
 
             /// Stop and Reset ENCODER
             backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -219,7 +205,6 @@ public class CompetitionHardware
         // Start the logging of measured acceleration
         //imu.startAccelerationIntegration(new Position(), new Velocity(), 100);
         //imu.stopAccelerationIntegration();
-
     }
 
     public void enableColorSensor(){
@@ -229,7 +214,7 @@ public class CompetitionHardware
 
     }
 
-    public int linearMove (int direction,double speed, double distance) {
+    public int linearMove (Direction direction,double speed, double distance) {
 
         int newBleftTarget;
         int newBrightTarget;
@@ -244,12 +229,10 @@ public class CompetitionHardware
 
         setDirection(direction);
 
-
         backLeft.setTargetPosition(newBleftTarget);
         backRight.setTargetPosition(newBrightTarget);
         frontLeft.setTargetPosition(newFleftTarget);
         frontRight.setTargetPosition(newFrightTarget);
-
 
         // Turn On RUN_TO_POSITION
         backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -257,9 +240,7 @@ public class CompetitionHardware
         frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-
         if (!activateSpeedProfile) {
-
             //Setting the power
             setPower4WDrive(Math.abs(speed));
 
@@ -277,7 +258,6 @@ public class CompetitionHardware
         setEncoder(true);
 
         return newBleftTarget;
-
     }
 
     public void set4WDriveWithSpeedProfile(double speed, int target, DcMotor motor){
@@ -318,8 +298,6 @@ public class CompetitionHardware
         backRight.setPower(BrightDriveSpeed);
         frontLeft.setPower(FleftDriveSpeed);
         frontRight.setPower(FrightDriveSpeed);
-
-
     }
 
     /*
@@ -327,7 +305,7 @@ public class CompetitionHardware
      when we put in each thing(forward,backward,right,left) it will come here and look for that
      */
 
-    public void setDirection(int direction){
+    public void setDirection(Direction direction){
 
         switch (direction){
             case FORWARD:
@@ -373,13 +351,11 @@ public class CompetitionHardware
             default:
                 break;
         }
-
-
     }
 
 
 
-    public void gyroMove (int direction,double speed, double angle) {
+    public void gyroMove(Direction direction,double speed, double angle) {
 
         enableGyro();
 
@@ -395,15 +371,11 @@ public class CompetitionHardware
 
         imu.stopAccelerationIntegration();
 
-
         // Stop all motion
         // setPower4WDrive(0);
-
     }
 
-
-    public int diagonalMove (int direction,double speed, double distance) {
-
+    public int diagonalMove (Direction direction,double speed, double distance) {
         int wheel1Target;
         int wheel2Target;
         DcMotor motor1 = null;
@@ -435,32 +407,26 @@ public class CompetitionHardware
                 motor2 = frontRight;
                 break;
 
-
             default:
                 break;
-
         }
 
         // Determine new target position, and pass to motor controller
         wheel1Target = motor1.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
         wheel2Target = motor2.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
 
-
         motor1.setTargetPosition(wheel1Target);
         motor2.setTargetPosition(wheel2Target);
-
-
 
         // Turn On RUN_TO_POSITION
         motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-
         //Setting the power
         motor1.setPower(speed);
         motor2.setPower(speed);
 
-        while (motor1.isBusy()&& motor2.isBusy()) {
+        while (motor1.isBusy() && motor2.isBusy()) {
             // just waiting when motors are busy
         }
 
@@ -508,19 +474,13 @@ public class CompetitionHardware
         int testTarget;
         testMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-
         // Determine new target position, and pass to motor controller
         testTarget = testMotor.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
 
-
-
-
         testMotor.setTargetPosition(testTarget);
-
 
         // Turn On RUN_TO_POSITION
         testMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
 
         if (!activateSpeedProfile) {
 
@@ -530,7 +490,6 @@ public class CompetitionHardware
             while (testMotor.isBusy() ) {
                 // just waiting when motors are busy
             }
-
         }
 
         // Stop all motion
@@ -538,7 +497,5 @@ public class CompetitionHardware
         //setEncoder(true);
 
         return testTarget;
-
     }
-
 }
