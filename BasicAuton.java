@@ -318,7 +318,6 @@ public class BasicAuton extends LinearOpMode {
         choiceOfArm.stop();
         //sleep(1000);
 
-
         choiceOfArm.releaseStone(0.5);
         sleep(2500);
 
@@ -338,29 +337,29 @@ public class BasicAuton extends LinearOpMode {
         telemetry.update();
     }
 
-    public int reverseDirection(int Direction) {
-        if (Direction == robot.LEFT)
-            return robot.RIGHT;
-        else if (Direction == robot.FORWARD)
-            return robot.REVERSE;
-        else if (Direction == robot.RIGHT)
-            return robot.LEFT;
+    public CompetitionHardware.Direction reverseDirection(CompetitionHardware.Direction Direction) {
+        if (Direction == CompetitionHardware.Direction.LEFT)
+            return CompetitionHardware.Direction.RIGHT;
+        else if (Direction == CompetitionHardware.Direction.FORWARD)
+            return CompetitionHardware.Direction.REVERSE;
+        else if (Direction == CompetitionHardware.Direction.RIGHT)
+            return CompetitionHardware.Direction.LEFT;
         else
-            return robot.FORWARD;
+            return CompetitionHardware.Direction.FORWARD;
     }
 
-    public String decodeDirection(int Direction) {
-        if (Direction == robot.LEFT)
+    public String decodeDirection(CompetitionHardware.Direction Direction) {
+        if (Direction == CompetitionHardware.Direction.LEFT)
             return "right";
-        else if (Direction == robot.FORWARD)
+        else if (Direction == CompetitionHardware.Direction.FORWARD)
             return "reverse";
-        else if (Direction == robot.RIGHT)
+        else if (Direction == CompetitionHardware.Direction.RIGHT)
             return "right";
         else
             return "forward";
     }
 
-    int linearMoveWrapper(int direction, double speed, double distance) {
+    int linearMoveWrapper(CompetitionHardware.Direction direction, double speed, double distance) {
         return robot.linearMove(direction, speed, distance);
     }
 
