@@ -105,35 +105,35 @@ public class AutonTestInWPull extends BasicAuton {
         if (opModeIsActive())
         {
 
-            robot.linearMove(robot.RIGHT, MAX_SPEED*0.7, 35);
+            robot.linearMove(CompetitionHardware.Direction.RIGHT, MAX_SPEED*0.7, 35);
             sleep(1000);
 
             getCube(robot.frontArm);
 
-            robot.linearMove(robot.REVERSE, MAX_SPEED*0.7, 85);
+            robot.linearMove(CompetitionHardware.Direction.REVERSE, MAX_SPEED*0.7, 85);
             sleep(1000);
 
-            robot.linearMove(robot.RIGHT, MAX_SPEED, 6);
+            robot.linearMove(CompetitionHardware.Direction.RIGHT, MAX_SPEED, 6);
             sleep(1000);
 
            dropCube(robot.frontArm);
 
-            robot.linearMove(robot.LEFT, MAX_SPEED, 30);
+            robot.linearMove(CompetitionHardware.Direction.LEFT, MAX_SPEED, 30);
             sleep(1000);
 
-            robot.linearMove(robot.FORWARD, MAX_SPEED*0.7, 26);
+            robot.linearMove(CompetitionHardware.Direction.FORWARD, MAX_SPEED*0.7, 26);
             sleep(1000);
 
-            robot.linearMove(robot.RIGHT, MAX_SPEED*0.7, 12);
+            robot.linearMove(CompetitionHardware.Direction.RIGHT, MAX_SPEED*0.7, 12);
             sleep(1000);
 
-            robot.linearMove(robot.REVERSE, MAX_SPEED*0.7, 4);
+            robot.linearMove(CompetitionHardware.Direction.REVERSE, MAX_SPEED*0.7, 4);
             sleep(1000);
 
-            robot.linearMove(robot.RIGHT, MAX_SPEED*0.7, 4);
+            robot.linearMove(CompetitionHardware.Direction.RIGHT, MAX_SPEED*0.7, 4);
             sleep(1000);
 
-            robot.linearMove(robot.FORWARD, MAX_SPEED*0.7, 28);
+            robot.linearMove(CompetitionHardware.Direction.FORWARD, MAX_SPEED*0.7, 28);
             sleep(1000);
 
             telemetry.addData("Path", "Complete :))))");
@@ -141,7 +141,7 @@ public class AutonTestInWPull extends BasicAuton {
         }
     }
 
-    public void linearMoveWrapper(int Direction, double Distance, boolean bHitWall)
+    public void linearMoveWrapper(CompetitionHardware.Direction Direction, double Distance, boolean bHitWall)
     {
         // accelerate to max speed for first 5", drive at max speed, slow down
 
@@ -153,7 +153,7 @@ public class AutonTestInWPull extends BasicAuton {
         telemetry.addData("Path", "went left " + decodeDirection(Direction));
     }
 
-    public void linearMoveWrapper2(int Direction, double Distance, boolean bHitWall)
+    public void linearMoveWrapper2(CompetitionHardware.Direction Direction, double Distance, boolean bHitWall)
     {
         // accelerate to max speed for first 5", drive at max speed, slow down
 
@@ -188,25 +188,25 @@ public class AutonTestInWPull extends BasicAuton {
         }
     }
 
-    public int reverseDirection(int Direction)
+    public CompetitionHardware.Direction reverseDirection(CompetitionHardware.Direction Direction)
     {
-        if(Direction == robot.LEFT)
-            return robot.RIGHT;
-        else if(Direction == robot.FORWARD)
-            return robot.REVERSE;
-        else if(Direction == robot.RIGHT)
-            return robot.LEFT;
+        if(Direction == CompetitionHardware.Direction.LEFT)
+            return CompetitionHardware.Direction.RIGHT;
+        else if(Direction == CompetitionHardware.Direction.FORWARD)
+            return CompetitionHardware.Direction.REVERSE;
+        else if(Direction == CompetitionHardware.Direction.RIGHT)
+            return CompetitionHardware.Direction.LEFT;
         else
-            return robot.FORWARD;
+            return CompetitionHardware.Direction.FORWARD;
     }
 
-    public String decodeDirection(int Direction)
+    public String decodeDirection(CompetitionHardware.Direction Direction)
     {
-        if(Direction == robot.LEFT)
+        if(Direction == CompetitionHardware.Direction.LEFT)
             return "right";
-        else if(Direction == robot.FORWARD)
+        else if(Direction == CompetitionHardware.Direction.FORWARD)
             return "reverse";
-        else if(Direction == robot.RIGHT)
+        else if(Direction == CompetitionHardware.Direction.RIGHT)
             return "right";
         else
             return "forward";
@@ -224,16 +224,16 @@ public class AutonTestInWPull extends BasicAuton {
             switch (strCommand[0])
             {
                 case "FORWARD":
-                    linearMoveWrapper(robot.FORWARD, strCommand[1], sleepInterval);
+                    linearMoveWrapper(CompetitionHardware.Direction.FORWARD, strCommand[1], sleepInterval);
                     break;
                 case "REVERSE":
-                    linearMoveWrapper(robot.REVERSE, strCommand[1], sleepInterval);
+                    linearMoveWrapper(CompetitionHardware.Direction.REVERSE, strCommand[1], sleepInterval);
                     break;
                 case "LEFT":
-                    linearMoveWrapper(robot.LEFT, strCommand[1], sleepInterval);
+                    linearMoveWrapper(CompetitionHardware.Direction.LEFT, strCommand[1], sleepInterval);
                     break;
                 case "RIGHT":
-                    linearMoveWrapper(robot.RIGHT, strCommand[1], sleepInterval);
+                    linearMoveWrapper(CompetitionHardware.Direction.RIGHT, strCommand[1], sleepInterval);
                     break;
                 default:
                     //throw new Exception("Command not fouNd");
@@ -242,7 +242,7 @@ public class AutonTestInWPull extends BasicAuton {
         }
     }
 
-    public void linearMoveWrapper(int intDirection, String strParams, int sleepInterval)
+    public void linearMoveWrapper(CompetitionHardware.Direction intDirection, String strParams, int sleepInterval)
     {
         String[] strParam = strParams.split(":");
         robot.linearMove(intDirection, Double.parseDouble(strParam[0]), Double.parseDouble(strParam[1]));
@@ -252,13 +252,13 @@ public class AutonTestInWPull extends BasicAuton {
         String strMessage;
         strMessage = "Uninitialized direction. Check your path declaration";
 
-        if(intDirection == robot.FORWARD)
+        if(intDirection == CompetitionHardware.Direction.FORWARD)
             strMessage = "moved forward";
-        else if(intDirection == robot.LEFT)
+        else if(intDirection == CompetitionHardware.Direction.LEFT)
             strMessage = "moved left";
-        else if(intDirection == robot.RIGHT)
+        else if(intDirection == CompetitionHardware.Direction.RIGHT)
             strMessage = "moved right";
-        else if(intDirection == robot.REVERSE)
+        else if(intDirection == CompetitionHardware.Direction.REVERSE)
             strMessage = "moved back";
 
         telemetry.addData("Path", strMessage);
