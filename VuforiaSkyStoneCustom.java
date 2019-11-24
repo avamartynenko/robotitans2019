@@ -136,11 +136,11 @@ public class VuforiaSkyStoneCustom extends BasicAuton {
         telemetry.addData("Offset ", "%.1f", SkyStoneOffset);
 
         if(SkyStoneOffset > 0)
-            robot.linearMove(robot.REVERSE, slowMoSpeed, SkyStoneOffset);
+            robot.linearMove(CompetitionHardware.Direction.REVERSE, slowMoSpeed, SkyStoneOffset);
         else
-            robot.linearMove(robot.FORWARD, slowMoSpeed, -SkyStoneOffset);
+            robot.linearMove(CompetitionHardware.Direction.FORWARD, slowMoSpeed, -SkyStoneOffset);
 
-        robot.linearMove(robot.RIGHT, MAX_SPEED*.8,25.5);
+        robot.linearMove(CompetitionHardware.Direction.RIGHT, MAX_SPEED*.8,25.5);
 
         pickupStone();
         deliverStone();
@@ -157,24 +157,24 @@ public class VuforiaSkyStoneCustom extends BasicAuton {
     }
 
     public void deliverStone(){
-        robot.linearMove(robot.LEFT, slowMoSpeed, safeDistanceOffset);
+        robot.linearMove(CompetitionHardware.Direction.LEFT, slowMoSpeed, safeDistanceOffset);
         sleep(750);
         double initialOffset = 8 * (2 - targetPostion); // stone dimentions are 8x4x5
-        robot.linearMove(robot.REVERSE, MAX_SPEED, dropZoneOffset - 16 + initialOffset);
-        robot.linearMove(robot.RIGHT, slowMoSpeed, 4);
+        robot.linearMove(CompetitionHardware.Direction.REVERSE, MAX_SPEED, dropZoneOffset - 16 + initialOffset);
+        robot.linearMove(CompetitionHardware.Direction.RIGHT, slowMoSpeed, 4);
 
         placeSkyStoneOnFoundation();
 
         //dropCube();  // basic auton will get the proper arm by its self
 
         // pullback and rotate
-        linearMoveWrapper(robot.LEFT, MAX_SPEED*0.6, 3);
+        linearMoveWrapper(CompetitionHardware.Direction.LEFT, MAX_SPEED*0.6, 3);
         //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
-        robot.gyroMove(robot.GYRO_LEFT, MAX_SPEED*0.8,75);
+        robot.gyroMove(CompetitionHardware.Direction.GYRO_LEFT, MAX_SPEED*0.8,75);
 
         reOrient();  // will change orientation based on alliance color
 
-        linearMoveWrapper(robot.REVERSE, slowMoSpeed, 10);
+        linearMoveWrapper(CompetitionHardware.Direction.REVERSE, slowMoSpeed, 10);
 
         // Grab and pull the platform
         robot.hookLatch.latch();
@@ -182,18 +182,18 @@ public class VuforiaSkyStoneCustom extends BasicAuton {
 
         // pull platform back
         //linearMoveWrapper(robot.FORWARD, 32, false);
-        linearMoveWrapper(robot.FORWARD, MAX_SPEED, 36);
+        linearMoveWrapper(CompetitionHardware.Direction.FORWARD, MAX_SPEED, 36);
 
         robot.hookLatch.release();
 
         // push platform to the corner
-        linearMoveWrapper(robot.RIGHT, MAX_SPEED,37);
+        linearMoveWrapper(CompetitionHardware.Direction.RIGHT, MAX_SPEED,37);
 
-        linearMoveWrapper(robot.REVERSE, MAX_SPEED,23);
+        linearMoveWrapper(CompetitionHardware.Direction.REVERSE, MAX_SPEED,23);
 
         // retreat and park under the bridge
 
-        linearMoveWrapper(robot.RIGHT, MAX_SPEED,22);
+        linearMoveWrapper(CompetitionHardware.Direction.RIGHT, MAX_SPEED,22);
     }
 
     public void goForSecondStone(){
