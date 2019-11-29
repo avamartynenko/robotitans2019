@@ -33,9 +33,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import android.graphics.Color;
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -44,6 +48,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+
+import static java.lang.Thread.sleep;
 
 
 /**
@@ -101,11 +107,21 @@ public class CompetitionHardware
         DIAGONAL_RIGHT_DOWN,
         DIAGONAL_LEFT_UP,
         DIAGONAL_LEFT_DOWN
-    };
+    }
+
+    public final double MAX_SPEED = 1;          // defines max robot speed. set to 1 for normal operation, .5 for debugging to observer robot moves in slow motion
+    public final double TURN_ERROR = 43;        // Robot over rotates by approximaterly 45 degrees if directed to turn 90 degrees at full speed
+    public final double NO_ERROR_SPEED = .14;   // max speed at which robot turns correctly, robot may not move any any speed less than .14
+    public final double STOP_GAP = 3;           // even at smallest possible speed there is still lag in processing wich results in overrun in case if power is killed once the angle is reach
+                                                // we need to kill power 3 degrees ahead of target angle to achive accurate turn angle
+                                                // STPO_GAP is dependent on turn speed and robot configuration and will need to be reset in case if robot configuraiton is changed
+    public final long OVERRAN_SLEEP_TIME = 50;  // how long robot should sleep for in uncontrolled spin before checking if it is stabilized
+
+    private boolean gyroInitialized = false;
 
     // variables for using gryo
     Orientation angles;
-    BNO055IMU imu;
+    public BNO055IMU imu;
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
@@ -192,15 +208,29 @@ public class CompetitionHardware
 
     public void enableGyro (){
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        imu = hwMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
+        if(!gyroInitialized) {
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+            parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+            parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+            parameters.loggingEnabled = true;
+            parameters.loggingTag = "IMU";
+            parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+            imu = hwMap.get(BNO055IMU.class, "imu");
+            imu.initialize(parameters);
+
+            while(!imu.isGyroCalibrated()){
+                try {
+                    sleep(50);
+                }
+                catch (Exception e) {
+                    Log.i("IMU", "Calibration terminated");
+                }
+            }
+
+            gyroInitialized = true;
+        }
+
         angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         // Start the logging of measured acceleration
         //imu.startAccelerationIntegration(new Position(), new Velocity(), 100);
@@ -211,11 +241,9 @@ public class CompetitionHardware
         // Gets Sensors
         colorsense = hwMap.get(ColorSensor.class, "color");
         colorsense.enableLed(true);
-
     }
 
     public int linearMove (Direction direction,double speed, double distance) {
-
         int newBleftTarget;
         int newBrightTarget;
         int newFleftTarget;
@@ -248,7 +276,7 @@ public class CompetitionHardware
                 // just waiting when motors are busy
             }
 
-        } else{
+        } else {
             set4WDriveWithSpeedProfile(Math.abs(speed), newBleftTarget, backLeft);
 
         }
@@ -282,18 +310,14 @@ public class CompetitionHardware
 
         setPower4WDrive(0);
         setEncoder(true);
-
     }
 
-
     public void setPower4WDrive(double speed){
-
         setPower4WDrive(speed,speed,speed,speed);
     }
 
     // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
     public void setPower4WDrive(double BleftDriveSpeed, double BrightDriveSpeed, double FleftDriveSpeed, double FrightDriveSpeed ){
-
         backLeft.setPower(BleftDriveSpeed);
         backRight.setPower(BrightDriveSpeed);
         frontLeft.setPower(FleftDriveSpeed);
@@ -304,7 +328,6 @@ public class CompetitionHardware
      we are setting what needs to be done(forward,backward,right,left)
      when we put in each thing(forward,backward,right,left) it will come here and look for that
      */
-
     public void setDirection(Direction direction){
 
         switch (direction){
@@ -353,8 +376,10 @@ public class CompetitionHardware
         }
     }
 
-
-
+    // WARNING: due to processing lag and robot inertia actual angle will usaully be different
+    // from requested angle except for very small speeds
+    // eg 90 degrees turn exected at full speed will result in approximately 45 degrees overrun
+    // use gyroMove2 in case if precision is required
     public void gyroMove(Direction direction,double speed, double angle) {
 
         enableGyro();
@@ -370,9 +395,82 @@ public class CompetitionHardware
         setPower4WDrive(0.0);
 
         imu.stopAccelerationIntegration();
+    }
 
-        // Stop all motion
-        // setPower4WDrive(0);
+    // DO NOT USE TO ROTATE THE PLATFORM!!!
+    public void gyroMove90(Direction direction, Telemetry telemetry) {
+        gyroMove2(direction, 90, telemetry);
+    }
+
+    // DO NOT USE TO ROTATE THE PLATFORM!!!
+    public void gyroMove2(Direction direction, double angle, double speed, Telemetry telemetry) {
+        double startAngle = getActualHeading();
+        telemetry.addLine("Gyro turn " + direction2string(direction) + " for " + angle + " degrees");
+        telemetry.addData("Start heading: ", "%.1f", startAngle);
+
+        if(!(direction == Direction.GYRO_LEFT || direction == Direction.GYRO_RIGHT))
+            throw new IllegalArgumentException("Direction should be either GYRO_LEFT or GYRO_RIGHT");
+
+        enableGyro();
+        setDirection(direction);
+
+        double currentTurnAngle;
+        setPower4WDrive(MAX_SPEED);
+
+        do {
+            currentTurnAngle = calcTurnAngleD(startAngle, getActualHeading());
+        }
+        while (currentTurnAngle < (angle - TURN_ERROR));
+        setPower4WDrive(0.0);
+
+        telemetry.addData("Uncorrected heading, currentTurnAngle: ", "%.1f %.1f", getAbsoluteHeading(), currentTurnAngle);
+
+        //wait for the robot to stop spinning after power is cut off
+        double spinAngle;
+        do {
+            spinAngle = (int) getActualHeading();
+            try {
+                sleep(OVERRAN_SLEEP_TIME);
+            }
+            catch (Exception e) {
+                Log.i("IMU", "Rotation spin stabilization failure");
+            }
+        }
+        while (spinAngle != (int) getActualHeading());
+
+        currentTurnAngle = calcTurnAngleD(startAngle, getActualHeading());
+        setPower4WDrive(NO_ERROR_SPEED * Math.signum(angle - currentTurnAngle));
+        double correctionAngle = Math.abs(angle - currentTurnAngle);
+        double correctionStart = getActualHeading();
+
+        telemetry.addData("Heading stabilized, correction angle: ", "%.1f %.1f", getAbsoluteHeading(), correctionAngle);
+
+        do {
+            currentTurnAngle = calcTurnAngleD(correctionStart, getActualHeading());
+        }
+        while (currentTurnAngle < (correctionAngle - STOP_GAP));
+        setPower4WDrive(0.0);
+
+        telemetry.addData("Corrected heading, completed turn: ", "%.1f %.1f", getAbsoluteHeading(), currentTurnAngle);
+    }
+
+    // DO NOT USE TO ROTATE THE PLATFORM!!!
+    public void gyroMove2(Direction direction, double angle, Telemetry telemetry) {
+        gyroMove2(direction, angle, MAX_SPEED, telemetry);
+    }
+
+    /**
+     * Calculate angle values between two directions in degrees
+     * @param startAngle the initial heading
+     * @param currentAngle current heading
+     * @return different between initial and current heading
+     */
+    private double calcTurnAngleD(double startAngle, double currentAngle) {
+        double turnAngle = Math.abs(currentAngle - startAngle);
+        turnAngle = (turnAngle > 360) ? turnAngle - 360 : turnAngle;
+        turnAngle = (turnAngle > 180) ? 360 - turnAngle : turnAngle;
+
+        return turnAngle;
     }
 
     public int diagonalMove (Direction direction,double speed, double distance) {
@@ -441,13 +539,13 @@ public class CompetitionHardware
 
     //GYRO TURNING
     //this will always give postitive angle
-    public double getAbsoluteHeading(){
+    public double getAbsoluteHeading() {
         return Math.abs(getActualHeading());
     }
 
     //GYRO TURNING
     //this will give the actual angle(+/-)
-    public double getActualHeading(){
+    public double getActualHeading() {
         return this.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
 
@@ -498,4 +596,43 @@ public class CompetitionHardware
 
         return testTarget;
     }
+
+    public void setZeroPowerMode(DcMotor.ZeroPowerBehavior behavior) {
+        backLeft.setZeroPowerBehavior(behavior);
+        backRight.setZeroPowerBehavior(behavior);
+        frontLeft.setZeroPowerBehavior(behavior);
+        frontLeft.setZeroPowerBehavior(behavior);
+    }
+
+    private String direction2string(Direction direction) {
+        String result = "UNKNOWN";
+
+        switch (direction)
+        {
+            case LEFT:
+                result = "LEFT";
+                break;
+            case RIGHT:
+                result = "RIGHT";
+                break;
+            case REVERSE:
+                result = "REVERSE";
+                break;
+            case FORWARD:
+                result = "FORWAR";
+                break;
+            case GYRO_LEFT:
+                result = "GYRO-LEFT";
+                break;
+            case GYRO_RIGHT:
+                result = "GYRO-RIGHT";
+                break;
+
+                default:
+                    break;
+        }
+
+        return result;
+    }
+
 }
