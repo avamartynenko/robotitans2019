@@ -29,25 +29,27 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+import android.util.Log;
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import android.graphics.Color;
-import android.util.Log;
-
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import java.util.Iterator;
 
 import static java.lang.Thread.sleep;
 
@@ -92,8 +94,10 @@ public class CompetitionHardware
     static final double     WHEEL_DIAMETER_INCHES   = 3.93701 ;     // For figuring circumference
     public final double     WHEEL_CIRCUMFRENCE      = WHEEL_DIAMETER_INCHES * 3.1415;
 
-    public final double  MECHANUM_CPI_RATIO  = 0.5; //since it is a 4 wheel drive, you have to half the CPI
+    // defines if robot stops motors in the end of the move
+    public boolean linkMoves = false;
 
+    public final double  MECHANUM_CPI_RATIO  = 0.5; //since it is a 4 wheel drive, you have to half the CPI
     public  final double   COUNTS_PER_INCH   = (COUNTS_PER_MOTOR_REV_WITH_GEAR/ WHEEL_CIRCUMFRENCE) * MECHANUM_CPI_RATIO;
 
     public enum Direction {
@@ -112,10 +116,11 @@ public class CompetitionHardware
     public final double MAX_SPEED = 1;          // defines max robot speed. set to 1 for normal operation, .5 for debugging to observer robot moves in slow motion
     public final double TURN_ERROR = 43;        // Robot over rotates by approximaterly 45 degrees if directed to turn 90 degrees at full speed
     public final double NO_ERROR_SPEED = .14;   // max speed at which robot turns correctly, robot may not move any any speed less than .14
-    public final double STOP_GAP = 3;           // even at smallest possible speed there is still lag in processing wich results in overrun in case if power is killed once the angle is reach
+    public final double STOP_GAP = 2;           // even at smallest possible speed there is still lag in processing wich results in overrun in case if power is killed once the angle is reach
                                                 // we need to kill power 3 degrees ahead of target angle to achive accurate turn angle
                                                 // STPO_GAP is dependent on turn speed and robot configuration and will need to be reset in case if robot configuraiton is changed
     public final long OVERRAN_SLEEP_TIME = 50;  // how long robot should sleep for in uncontrolled spin before checking if it is stabilized
+    public final double PRECISION_TURN_ZONE = TURN_ERROR/2;    // skip fast turn, turn at slowest speed instead
 
     private boolean gyroInitialized = false;
 
@@ -207,12 +212,11 @@ public class CompetitionHardware
     }
 
     public void enableGyro (){
-
         if(!gyroInitialized) {
             BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
             parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
             parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-            parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+            parameters.calibrationDataFile = getREVName() + "_AdafruitIMUCalibration.json"; // see the calibration sample opmode
             parameters.loggingEnabled = true;
             parameters.loggingTag = "IMU";
             parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
@@ -224,7 +228,7 @@ public class CompetitionHardware
                     sleep(50);
                 }
                 catch (Exception e) {
-                    Log.i("IMU", "Calibration terminated");
+                    Log.e("IMU", "Calibration terminated");
                 }
             }
 
@@ -274,16 +278,20 @@ public class CompetitionHardware
 
             while (backLeft.isBusy() && backRight.isBusy() && frontLeft.isBusy() && frontRight.isBusy()) {
                 // just waiting when motors are busy
+                Thread.yield();
             }
-
         } else {
             set4WDriveWithSpeedProfile(Math.abs(speed), newBleftTarget, backLeft);
-
         }
 
-        // Stop all motion
-        setPower4WDrive(0);
-        setEncoder(true);
+        // Stop all motion - TODO test if it actually works - encoder run to position might actually stop motors
+        if(!linkMoves) {
+            setZeroPowerMode(DcMotor.ZeroPowerBehavior.BRAKE);
+            setPower4WDrive(0);
+            setEncoder(true);
+        }
+        else
+            setZeroPowerMode(DcMotor.ZeroPowerBehavior.FLOAT);
 
         return newBleftTarget;
     }
@@ -415,28 +423,30 @@ public class CompetitionHardware
         setDirection(direction);
 
         double currentTurnAngle;
-        setPower4WDrive(MAX_SPEED);
 
-        do {
-            currentTurnAngle = calcTurnAngleD(startAngle, getActualHeading());
-        }
-        while (currentTurnAngle < (angle - TURN_ERROR));
-        setPower4WDrive(0.0);
+        // sckip fast turn zone if requested angle inside of precision turn zone
+        if(angle > PRECISION_TURN_ZONE) {
+            setPower4WDrive(MAX_SPEED);
 
-        telemetry.addData("Uncorrected heading, currentTurnAngle: ", "%.1f %.1f", getAbsoluteHeading(), currentTurnAngle);
-
-        //wait for the robot to stop spinning after power is cut off
-        double spinAngle;
-        do {
-            spinAngle = (int) getActualHeading();
-            try {
-                sleep(OVERRAN_SLEEP_TIME);
+            do {
+                currentTurnAngle = calcTurnAngleD(startAngle, getActualHeading());
             }
-            catch (Exception e) {
-                Log.i("IMU", "Rotation spin stabilization failure");
+            while (currentTurnAngle < (angle - TURN_ERROR));
+            setPower4WDrive(0.0);
+
+            telemetry.addData("Uncorrected heading, currentTurnAngle: ", "%.1f %.1f", getAbsoluteHeading(), currentTurnAngle);
+            //wait for the robot to stop spinning after power is cut off
+            double spinAngle;
+            do {
+                spinAngle = (int) getActualHeading();
+                try {
+                    sleep(OVERRAN_SLEEP_TIME);
+                } catch (Exception e) {
+                    Log.i("IMU", "Rotation spin stabilization failure");
+                }
             }
+            while (spinAngle != (int) getActualHeading());
         }
-        while (spinAngle != (int) getActualHeading());
 
         currentTurnAngle = calcTurnAngleD(startAngle, getActualHeading());
         setPower4WDrive(NO_ERROR_SPEED * Math.signum(angle - currentTurnAngle));
@@ -444,7 +454,6 @@ public class CompetitionHardware
         double correctionStart = getActualHeading();
 
         telemetry.addData("Heading stabilized, correction angle: ", "%.1f %.1f", getAbsoluteHeading(), correctionAngle);
-
         do {
             currentTurnAngle = calcTurnAngleD(correctionStart, getActualHeading());
         }
@@ -526,6 +535,7 @@ public class CompetitionHardware
 
         while (motor1.isBusy() && motor2.isBusy()) {
             // just waiting when motors are busy
+            Thread.yield();
         }
 
         // Stop all motion
@@ -556,15 +566,8 @@ public class CompetitionHardware
         float hsvValues[] = {0F, 0F, 0F};
         final double SCALE_FACTOR = 255;
         Color.RGBToHSV((int) (colorsense.red() * SCALE_FACTOR), (int) (colorsense.green() * SCALE_FACTOR), (int) (colorsense.blue() * SCALE_FACTOR), hsvValues);
-        if (hsvValues[0] < 120 && hsvValues[0] > 20) {
-            // Detected a non-white color. (Probably yellow lol)
-            return true;
-        }
-        else {
-            // Detected an unsupported color. (Probably white lol)
-            return false;
-        }
 
+        return (hsvValues[0] > 20 && hsvValues[0] < 120); // Detected a non-white color. (Probably yellow lol)
     }
 
     public int linearMoveOne (DcMotor testMotor, int direction,double speed, double distance) {
@@ -587,6 +590,7 @@ public class CompetitionHardware
 
             while (testMotor.isBusy() ) {
                 // just waiting when motors are busy
+                Thread.yield();
             }
         }
 
@@ -635,4 +639,17 @@ public class CompetitionHardware
         return result;
     }
 
+    private String getREVName() {
+        String sResult = "";
+
+        for(Object o: hwMap) {
+            HardwareDevice dev = (HardwareDevice)o;
+            if(dev.getDeviceName().contains("REV Expansion Hub IMU")) {
+                sResult = dev.getConnectionInfo().split(";")[0].split(" ")[1];
+                break;
+            }
+        }
+
+        return sResult;
+    }
 }
