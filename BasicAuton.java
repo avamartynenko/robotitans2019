@@ -191,7 +191,6 @@ public class BasicAuton extends LinearOpMode {
 
                 break;
 
-
             default:
                 break;
         }
@@ -217,7 +216,6 @@ public class BasicAuton extends LinearOpMode {
                 break;
         }
 
-
     }
 
     public void pickUpSkyStone() {
@@ -232,11 +230,9 @@ public class BasicAuton extends LinearOpMode {
         choiceOfArm.liftUp(0.9);
         sleep(1000);
 
-
     }
 
     public void moveToFoundation(int skyStonePosition) {
-
 
         switch (skyStonePosition) {
             case SKYSTONE_LEFT:
@@ -250,7 +246,6 @@ public class BasicAuton extends LinearOpMode {
             case SKYSTONE_RIGHT:
 
                 break;
-
 
             default:
                 break;
@@ -273,7 +268,6 @@ public class BasicAuton extends LinearOpMode {
 
     public void moveFoundationToBuildZone() {
 
-
     }
 
     public void getCube() {
@@ -286,7 +280,6 @@ public class BasicAuton extends LinearOpMode {
 
         choiceOfArm.stop();
         //sleep(500);
-
 
         choiceOfArm.latchStone(0.5);
         sleep(1500);
@@ -371,59 +364,21 @@ public class BasicAuton extends LinearOpMode {
             FileOutputStream outputStream = new FileOutputStream(file);
             try {
                 bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-            } finally {
+            }
+            finally {
                 outputStream.close();
                 telemetry.log().add("captured %s", file.getName());
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             RobotLog.ee(TAG, e, "exception in captureFrameToFile()");
         }
     }
 
     Bitmap locateStones(Bitmap bmp, CameraCalibration cc, float currPitch, float currRoll) {
-/*        // Initialize a new Canvas instance
-        Canvas canvas = new Canvas(bmp);
-
-        // Draw a solid color to the canvas background
-//        canvas.drawColor(Color.RED);
-
-        // Initialize a new Paint instance to draw the Rectangle
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.YELLOW);
-        paint.setAntiAlias(true);
-
-        int padding = 10;
-
-        Rect rectangle = new Rect(
-                padding, // Left
-                padding, // Top
-                canvas.getWidth() - padding, // Right
-                canvas.getHeight() - padding // Bottom
-        );
-
-        canvas.drawRect(rectangle,paint);
-
-        paint.setColor((Color.RED));
-        paint.setStrokeWidth(3f);
-        if(currRoll > 0) // draws line in top half
-            canvas.drawLine((float) .3*bmp.getWidth(), 0, (float) .3*bmp.getWidth(), bmp.getHeight(), paint);
-        else
-            canvas.drawLine((float) .3*bmp.getWidth(), 0, (float) .3*bmp.getWidth(), bmp.getHeight(), paint);
-
-        paint.setColor(Color.BLUE);
-        canvas.drawLine((float) .25*bmp.getWidth(), 0, (float) .25*bmp.getWidth(), bmp.getHeight(), paint);
-
-        paint.setTextSize(20);
-        canvas.drawText(String.format("%.3f", currRoll), 100, 100, paint);
-
-        paint.setColor(Color.WHITE);*/
         int horizon = horizonLine(bmp, cc, currPitch, currRoll);
-        //canvas.drawLine(horizon, 0, horizon, bmp.getHeight(), paint);
 
-        //saveBitmapToFile(bmp);
         return Bitmap.createBitmap(bmp, horizon - STONE_HEIGHT, 0, 2 * STONE_HEIGHT, bmp.getHeight());
-        //saveBitmapToFile(bmpCrop);
     }
 
     int horizonLine(Bitmap bmp, CameraCalibration cc, float currPitch, float currRoll) {
@@ -540,12 +495,10 @@ public class BasicAuton extends LinearOpMode {
                     if (iLum[0] <= iLum[1] && iLum[0] <= iLum[2]) {
                         sConfig = "X00";
                         iPostion = 0;
-                    }
-                    else if (iLum[1] <= iLum[0] && iLum[1] <= iLum[2]) {
+                    } else if (iLum[1] <= iLum[0] && iLum[1] <= iLum[2]) {
                         iPostion = 1;
                         sConfig = "0X0";
-                    }
-                    else {
+                    } else {
                         iPostion = 2;
                         sConfig = "00X";
                     }
@@ -559,5 +512,16 @@ public class BasicAuton extends LinearOpMode {
 
         return iPostion;
     }
+
+    /**
+     * Picks up the stone
+     */
+    protected void pickupStone() {
+        choiceOfArm.latchStone(1.0);
+        choiceOfArm.goDown(1.0);
+        sleep(2000);
+        choiceOfArm.liftUp(1.0);
+    }
 }
+
 
