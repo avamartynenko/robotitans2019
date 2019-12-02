@@ -153,41 +153,6 @@ public class AutonTestInWPull extends BasicAuton {
         telemetry.addData("Path", "went left " + decodeDirection(Direction));
     }
 
-    public void linearMoveWrapper2(CompetitionHardware.Direction Direction, double Distance, boolean bHitWall)
-    {
-        // accelerate to max speed for first 5", drive at max speed, slow down
-
-        if(bHitWall)
-            Distance += WALL_OVERRUN;
-
-        // assuming 5 step acceleration
-        int accelerateSteps = (int)((Distance / 2) >= 5 ? 5 : (Distance / 2));
-
-        // accelerate
-        for(int i=0; i<accelerateSteps; i++)
-            robot.linearMove(Direction, START_SPEED + i*.1, 1);
-
-        // drive
-        if(Distance > 2*accelerateSteps)
-            robot.linearMove(Direction, MAX_SPEED, Distance - 2*accelerateSteps);
-
-        // slow down
-        for(int i=accelerateSteps; i>0; i--)
-            robot.linearMove(Direction, START_SPEED + i*.1, 1);
-
-        robot.linearMove(Direction, MAX_SPEED, Distance);
-
-        sleep(bHitWall ? 0 : MOVE_PAUSE);
-        telemetry.addData("Path", "went left " + decodeDirection(Direction));
-
-        if(bHitWall)
-        {
-            robot.linearMove(reverseDirection(Direction), MAX_SPEED/2, WALL_RECOIL);
-            sleep(MOVE_PAUSE/2);
-            telemetry.addData("Path", "aligned against the wall ");
-        }
-    }
-
     public CompetitionHardware.Direction reverseDirection(CompetitionHardware.Direction Direction)
     {
         if(Direction == CompetitionHardware.Direction.LEFT)
