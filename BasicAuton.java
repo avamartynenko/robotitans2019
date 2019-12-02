@@ -348,17 +348,6 @@ public class BasicAuton extends LinearOpMode {
             return CompetitionHardware.Direction.FORWARD;
     }
 
-    public String decodeDirection(CompetitionHardware.Direction Direction) {
-        if (Direction == CompetitionHardware.Direction.LEFT)
-            return "right";
-        else if (Direction == CompetitionHardware.Direction.FORWARD)
-            return "reverse";
-        else if (Direction == CompetitionHardware.Direction.RIGHT)
-            return "right";
-        else
-            return "forward";
-    }
-
     int linearMoveWrapper(CompetitionHardware.Direction direction, double speed, double distance) {
         return robot.linearMove(direction, speed, distance);
     }
