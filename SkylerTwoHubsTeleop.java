@@ -49,19 +49,22 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name = "SkylerTwoHubsTeleop", group = "Pushbot")
+@TeleOp(name="SkylerTwoHubsTeleop", group="Competition")
 //@Disabled
 public class SkylerTwoHubsTeleop extends LinearOpMode {
 
-    private double SENSITIVITY_DRIVE = 0.8;
-    private CompetitionHardware robot = new CompetitionHardware();   // Use a Pushbot's hardware
-    private boolean elevatorLock = false;
-    private boolean hooksLatched = false;
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
+    CompetitionHardware robot = new CompetitionHardware();   // Use a Pushbot's hardware
+    private double right_stick_speed;
+    private double left_stick_speed;
+    private boolean elevatorLock = false;
+    private boolean hooksLatched = false;
+    private double SENSITIVITY_DRIVE = 0.8;
 
     @Override
     public void runOpMode() {
+
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
@@ -69,74 +72,146 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
         robot.initTeleopModules();
         robot.backArm.moveToHomePosition();
 
-
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
+            // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
+            if (gamepad1.left_stick_y > 0){
+                left_stick_speed = gamepad1.left_stick_y * gamepad1.left_stick_y;
+            }else if (gamepad1.left_stick_y < 0){
+                left_stick_speed = -(gamepad1.left_stick_y * gamepad1.left_stick_y);
+            }else{
+                left_stick_speed = 0;
+            }
 
-            setDriveSpeedAndDirection();
+            if(!gamepad1.left_stick_button)
+                left_stick_speed = left_stick_speed * SENSITIVITY_DRIVE;
+
+            if (gamepad1.right_stick_y > 0){
+                right_stick_speed = gamepad1.right_stick_y * gamepad1.right_stick_y;
+            } else if(gamepad1.right_stick_y < 0){
+                right_stick_speed = -(gamepad1.right_stick_y * gamepad1.right_stick_y);
+            } else{
+                right_stick_speed = 0;
+            }
+
+            if(!gamepad1.right_stick_button)
+                right_stick_speed = right_stick_speed * SENSITIVITY_DRIVE;
+
+            robot.setPower4WDrive(-left_stick_speed, -right_stick_speed, -left_stick_speed, -right_stick_speed);
+
+            double slowspeed = 0.4;
+            if(gamepad1.dpad_down){
+                robot.setPower4WDrive(-slowspeed, -slowspeed, -slowspeed, -slowspeed);
+            }
+            if(gamepad1.dpad_up){
+                robot.setPower4WDrive(slowspeed, slowspeed, slowspeed, slowspeed);
+            }
+            if (gamepad1.dpad_left){
+                robot.setPower4WDrive(slowspeed, -slowspeed, -slowspeed, slowspeed);
+            }
+            if (gamepad1.dpad_right){
+                robot.setPower4WDrive(-slowspeed, slowspeed, slowspeed, -slowspeed );
+            }
+
+            if (gamepad1.right_trigger > 0){
+
+                telemetry.addData("Right trigger pressed.", gamepad1.right_trigger);
+
+                // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
+                //robot.setPower4WDrive(gamepad1.right_trigger, -gamepad1.right_trigger, -gamepad1.right_trigger, gamepad1.right_trigger ); // ORIG
+                robot.setPower4WDrive(-gamepad1.right_trigger, gamepad1.right_trigger, gamepad1.right_trigger, -gamepad1.right_trigger );
+            }
+            else if (gamepad1.left_trigger > 0 ) {
+
+                telemetry.addData("Left trigger pressed.", gamepad1.left_trigger);
+
+                // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
+                //robot.setPower4WDrive(-gamepad1.left_trigger, gamepad1.left_trigger, gamepad1.left_trigger, -gamepad1.left_trigger); // ORIG
+                robot.setPower4WDrive(gamepad1.left_trigger, -gamepad1.left_trigger, -gamepad1.left_trigger, gamepad1.left_trigger);
+            }
+
+
 
             //intake motors
             if (gamepad1.left_bumper || hooksLatched) {
+
                 hooksLatched = true;
                 robot.hookLatch.latch();
+
             }
 
-            if (gamepad1.right_bumper || !hooksLatched) {
+            if (gamepad1.right_bumper || !hooksLatched){
+
                 hooksLatched = false;
                 robot.hookLatch.release();
+
             }
 
             //gamepad 1 ends here
 
             //gamepad 2 starts here
 
+
             //front side auton arm
-            if (gamepad2.y) {
+            if(gamepad2.y){
+
                 robot.frontArm.liftUp(0.8);
-            } else if (gamepad2.a) {
+            }
+            else if(gamepad2.a){
+
                 robot.frontArm.goDown(0.8);
-            } else {
+            }
+            else {
+
                 robot.frontArm.stop();
             }
 
-            if (gamepad2.x) {
+            if(gamepad2.x){
+
                 robot.frontArm.releaseStone(0.8);
-            } else if (gamepad2.b) {
+            }
+            else if(gamepad2.b){
+
                 robot.frontArm.latchStone(0.8);
-            } else {
+            }
+            else{
+
                 robot.frontArm.stop();
             }
 
             //intake motors
-            if (gamepad2.left_trigger > 0) {
+            if (gamepad2.left_trigger > 0){
                 robot.intakeMech.run(-robot.intakeMech.INTAKE_SPEED);
-            } else if (gamepad2.right_trigger > 0) {
+            } else if(gamepad2.right_trigger > 0) {
                 robot.intakeMech.run(robot.intakeMech.INTAKE_SPEED);
-            } else {
+            } else{
+
                 robot.intakeMech.stop();
             }
 
             //elevator
             robot.liftMech.runElevator(-gamepad2.left_stick_y);
 
-            if (gamepad2.left_stick_y > 0 || gamepad2.left_stick_y < 0) {
+            if(gamepad2.left_stick_y>0 || gamepad2.left_stick_y<0){
                 telemetry.addData("Lift Ele", " " + -gamepad2.left_stick_y);
                 telemetry.update();
             }
 
-            if (gamepad2.back) {
-                if (elevatorLock) {
+            if(gamepad2.back){
+                if(elevatorLock) {
                     robot.liftMech.runElevator(0.2);
                 } else {
                     elevatorLock = false;
                 }
+
             }
 
             //grabber
@@ -146,7 +221,7 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
                 telemetry.addData("grabStone leftB pushing to 0.0", " " + gamepad2.left_bumper);
                 telemetry.update();
 
-            } else if (gamepad2.right_bumper) {
+            } else if (gamepad2.right_bumper){
 
                 robot.liftMech.grabber.setPosition(robot.liftMech.GRABBER_LOCK_POSITION);
                 telemetry.addData("grabStone rightB pushing to 1.0", " " + gamepad2.right_bumper);
@@ -154,12 +229,14 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
             }
 
+
             //Twist
-            if (gamepad2.right_stick_x < 0) {
+            if (gamepad2.right_stick_x < 0)
+            {
                 robot.liftMech.twister.setPosition(robot.liftMech.TWISTER_HOME_POSITION);
                 robot.liftMech.grabber.setPosition(robot.liftMech.GRABBER_RELEASE_POSITION); //0.15
                 //robot.liftMech.grabber.setPosition(1.0);
-            } else if (gamepad2.right_stick_x > 0) {
+            } else if(gamepad2.right_stick_x > 0 ){
                 robot.liftMech.twister.setPosition(robot.liftMech.TWISTER_DELIVER_POSITION);
             }
 
@@ -179,105 +256,5 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.update();
 
-    }
-
-    private void setDriveSpeedAndDirection() {
-        // original dpad movements per Summer's request
-        if (gamepad1.dpad_down || gamepad1.dpad_up || gamepad1.dpad_left || gamepad1.dpad_right) {
-
-            double slowspeed = 0.4;
-            if (gamepad1.dpad_down)
-                robot.setPower4WDrive(-slowspeed, -slowspeed, -slowspeed, -slowspeed);
-
-            if (gamepad1.dpad_up)
-                robot.setPower4WDrive(slowspeed, slowspeed, slowspeed, slowspeed);
-
-            if (gamepad1.dpad_left)
-                robot.setPower4WDrive(slowspeed, -slowspeed, -slowspeed, slowspeed);
-
-            if (gamepad1.dpad_right)
-                robot.setPower4WDrive(-slowspeed, slowspeed, slowspeed, -slowspeed);
-
-            return;
-        }
-
-        telemetry.addData("left stick x, y, trigger, btn: ", "%.2f %.2f %.2f %s", gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.left_trigger, (gamepad1.left_stick_button ? "on" : "off"));
-        telemetry.addData("right stick x, y, trigger, btn: ", "%.2f %.2f %.2f %s", gamepad1.right_stick_x, gamepad1.right_stick_y, gamepad1.right_trigger, (gamepad1.right_stick_button ? "on" : "off"));
-
-        double magnitude_base = .8;
-        double rotation_base = .5;
-        double precision_divider = 2;
-
-        // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
-        double x = gamepad1.left_stick_x, y = gamepad1.left_stick_y; // y position needs to be reversed
-        double angle = Math.atan2(y, x);
-        double magnitude = magnitude_base * Math.sqrt(y * y + x * x);
-        // make angle stick to pi/4
-        double angle_step = Math.toRadians(15); // +- 15 degrees
-        if(Math.abs(angle) <= angle_step)
-            angle = 0;
-        else if(Math.abs(Math.PI/2 - angle) <= angle_step)
-            angle = Math.PI/2;
-        else if(Math.abs(angle + Math.PI/2) <= angle_step)
-            angle = -Math.PI/2;
-        else if(Math.abs(Math.PI - angle) <= angle_step)
-            angle = Math.PI;
-
-        double rotation = rotation_base * gamepad1.right_stick_x;
-        telemetry.addData("raw direction angle, magnitude, rotation: ", "%.0f %.2f %.2f", Math.toDegrees(angle), magnitude, rotation);
-
-        // slow down with buttons
-        if (gamepad1.left_stick_button)
-            magnitude /= precision_divider;
-        if (gamepad1.right_stick_button)
-            rotation /= precision_divider;
-
-        // accelerate turn with right trigger
-        rotation *= (rotation_base + (1-rotation_base)*gamepad1.right_trigger)/rotation_base;
-
-        telemetry.addData("adj direction angle, magnitude, rotation: ", "%.0f %.2f %.2f", Math.toDegrees(angle), magnitude, rotation);
-
-        double v1 = magnitude * Math.sin(angle + 3 * Math.PI / 4) + rotation; // fl
-        double v2 = magnitude * Math.cos(angle + 3 * Math.PI / 4) - rotation; // fr
-        double v3 = magnitude * Math.cos(angle + 3 * Math.PI / 4) + rotation; // bl
-        double v4 = magnitude * Math.sin(angle + 3 * Math.PI / 4) - rotation; // br
-
-        telemetry.addData("base v1 v2 v3 v4: ", "%.2f %.2f %.2f %.2f", v1, v2, v3, v4);
-
-        // normalize speed
-        double scaleFactor = Math.max(Math.max(Math.abs(v1), Math.abs(v2)), Math.max(Math.abs(v3), Math.abs(v4)));
-
-        // reduce speed with stick button
-        if (gamepad1.left_stick_button)
-            scaleFactor *= precision_divider;
-        if (gamepad1.right_stick_button)
-            scaleFactor *= precision_divider;
-
-        // accelerate with trigger
-        scaleFactor = magnitude_base / Math.abs(scaleFactor);
-        double speedBump = (1 - magnitude_base) * Math.max(gamepad1.left_trigger, gamepad1.right_trigger) * scaleFactor;
-        v1 *= scaleFactor;
-        v1 += v1 * speedBump;
-        v2 *= scaleFactor;
-        v2 += v2 * speedBump;
-        v3 *= scaleFactor;
-        v3 += v3 * speedBump;
-        v4 *= scaleFactor;
-        v4 += speedBump;
-
-        // fix rounding errors
-        scaleFactor = Math.max(Math.max(Math.abs(v1), Math.abs(v2)), Math.max(Math.abs(v3), Math.abs(v4)));
-        if (scaleFactor > 1) {
-            v1 /= scaleFactor;
-            v2 /= scaleFactor;
-            v3 /= scaleFactor;
-            v4 /= scaleFactor;
-        }
-
-        telemetry.addData("norm v1 v2 v3 v4: ", "%.2f %.2f %.2f %.2f", v1, v2, v3, v4);
-        telemetry.update();
-
-        // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
-        robot.setPower4WDrive(v3, v4, v1, v2);
     }
 }
