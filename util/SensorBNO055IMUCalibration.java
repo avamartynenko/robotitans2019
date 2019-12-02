@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.POC;
+package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.hardware.adafruit.AdafruitBNO055IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -47,8 +47,6 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Locale;
-
-import static com.qualcomm.hardware.bosch.BNO055IMU.SensorMode.AMG;
 
 /**
  * {@link SensorBNO055IMUCalibration} calibrates the IMU accelerometer per
@@ -102,7 +100,7 @@ import static com.qualcomm.hardware.bosch.BNO055IMU.SensorMode.AMG;
  * @see <a href="https://www.bosch-sensortec.com/bst/products/all_products/bno055">BNO055 product page</a>
  * @see <a href="https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST_BNO055_DS000_14.pdf">BNO055 specification</a>
  */
-@TeleOp(name = "POC: BNO055 IMU Calibration", group = "POC")
+@TeleOp(name = "Util: BNO055 IMU Calibration", group = "Util")
 @Disabled                           // Uncomment this to add to the opmode list
 public class SensorBNO055IMUCalibration extends LinearOpMode
     {
