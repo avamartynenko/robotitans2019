@@ -83,10 +83,10 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * is explained below.
  */
 
-
-@Autonomous(name="Custom Vuforia SkyStone", group ="Competition")
+// Use fast skystone detection method by comparing brightness of the stone instead of vuforia target recognition
+@Autonomous(name="SkyStone - Fast", group ="Competition")
 //@Disabled
-public class VuforiaSkyStoneCustom extends BasicAuton {
+public class SkyStoneFast extends BasicAuton {
 
     private int targetPostion = 0;
 
@@ -96,7 +96,6 @@ public class VuforiaSkyStoneCustom extends BasicAuton {
     private int sleepTime = 100;
     private int detectionWaitTime = 2000;
     private int latchTime = 1250;
-
 
     @Override public void runOpMode() {
         super.initialize();
@@ -146,14 +145,6 @@ public class VuforiaSkyStoneCustom extends BasicAuton {
         deliverStone();
         //goForSecondStone();
         parkUnderTheBridge();
-    }
-
-    void pickupStone()
-    {
-        choiceOfArm.latchStone(1.0);
-        choiceOfArm.goDown(1.0);
-        sleep(2000);
-        choiceOfArm.liftUp(1.0);
     }
 
     public void deliverStone(){
