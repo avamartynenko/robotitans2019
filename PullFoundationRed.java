@@ -85,19 +85,19 @@ public class PullFoundationRed extends BasicAuton {
         {
             reOrient();
             //robot.linearMove(robot.LEFT,0.6,11);
-            robot.linearMove(robot.REVERSE,0.6,32);
-            robot.linearMove(robot.REVERSE,0.1,2);
+            robot.linearMove(CompetitionHardware.Direction.REVERSE,0.6,32);
+            robot.linearMove(CompetitionHardware.Direction.REVERSE,0.1,2);
             sleep(1000);
             robot.hookLatch.latch();
-            robot.gyroMove(robot.GYRO_RIGHT,0.2,15);
+            robot.gyroMove(CompetitionHardware.Direction.GYRO_RIGHT,0.2,15);
             sleep(1000);
-            robot.linearMove(robot.FORWARD,0.6,25);
-            robot.gyroMove(robot.GYRO_RIGHT,0.2,75);
-            robot.linearMove(robot.REVERSE,0.6,5);
+            robot.linearMove(CompetitionHardware.Direction.FORWARD,0.6,25);
+            robot.gyroMove(CompetitionHardware.Direction.GYRO_RIGHT,0.2,75);
+            robot.linearMove(CompetitionHardware.Direction.REVERSE,0.6,5);
             robot.hookLatch.release();
-            robot.linearMove(robot.LEFT,0.7,15);
+            robot.linearMove(CompetitionHardware.Direction.LEFT,0.7,15);
             //robot.linearMove(robot.LEFT,0.5,8);
-            robot.linearMove(robot.FORWARD,0.6,45);
+            robot.linearMove(CompetitionHardware.Direction.FORWARD,0.6,45);
             sleep(20000);
 
 
