@@ -174,6 +174,7 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
                 robot.frontArm.stop();
             }
 
+
             if(gamepad2.x){
 
                 robot.frontArm.releaseStone(0.8);
@@ -256,5 +257,5 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.update();
 
+        }
     }
-}
