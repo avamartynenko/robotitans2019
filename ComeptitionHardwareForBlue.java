@@ -19,7 +19,7 @@ public class ComeptitionHardwareForBlue extends CompetitionHardware {
 
 
     @Override
-    public void setDirection(int direction){
+    public void setDirection(Direction direction){
 
         switch (currentOrtientation){
             case ORIENTATION_TWO:
@@ -45,7 +45,7 @@ public class ComeptitionHardwareForBlue extends CompetitionHardware {
      */
 
     //@Override
-    public void setDirectionOrientatonOne(int direction){
+    public void setDirectionOrientatonOne(Direction direction){
 
         switch (direction){
             case REVERSE:
@@ -95,7 +95,7 @@ public class ComeptitionHardwareForBlue extends CompetitionHardware {
 
     }
 
-    public void setDirectionOrientationTwo(int direction){
+    public void setDirectionOrientationTwo(Direction direction){
 
         switch (direction){
             case FORWARD:

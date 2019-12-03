@@ -88,8 +88,8 @@ public class AutonTestEx extends BasicAuton {
         if (opModeIsActive())
         {
             // get cube
-            linearMoveWrapper(robot.FORWARD, MAX_SPEED, 27); // runinto the wall
-            linearMoveWrapper(robot.RIGHT, MAX_SPEED, 26.5);
+            linearMoveWrapper(CompetitionHardware.Direction.FORWARD, MAX_SPEED, 27); // runinto the wall
+            linearMoveWrapper(CompetitionHardware.Direction.RIGHT, MAX_SPEED, 26.5);
 
             telemetry.addData("Status", "Engaging arm");
             telemetry.update();
@@ -99,25 +99,25 @@ public class AutonTestEx extends BasicAuton {
             getCube(); // basic auton will get the proper arm by its self
 
             // place cube
-            linearMoveWrapper(robot.LEFT, MAX_SPEED,27);
-            linearMoveWrapper(robot.REVERSE, 1, 128);
+            linearMoveWrapper(CompetitionHardware.Direction.LEFT, MAX_SPEED,27);
+            linearMoveWrapper(CompetitionHardware.Direction.REVERSE, 1, 128);
             sleep(50);
 
-            linearMoveWrapper(robot.RIGHT, MAX_SPEED*0.8, 31);
+            linearMoveWrapper(CompetitionHardware.Direction.RIGHT, MAX_SPEED*0.8, 31);
             //linearMoveWrapper(robot.FORWARD,10, false);
-            linearMoveWrapper(robot.FORWARD, MAX_SPEED*0.8, 12);
+            linearMoveWrapper(CompetitionHardware.Direction.FORWARD, MAX_SPEED*0.8, 12);
 
             dropCube();  // basic auton will get the proper arm by its self
 
             // pullback and rotate
-            linearMoveWrapper(robot.LEFT, MAX_SPEED*0.6, 4);
+            linearMoveWrapper(CompetitionHardware.Direction.LEFT, MAX_SPEED*0.6, 4);
             //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
-            robot.gyroMove(robot.GYRO_LEFT, MAX_SPEED*0.8,80);
+            robot.gyroMove(CompetitionHardware.Direction.GYRO_LEFT, MAX_SPEED*0.8,80);
             //linearMoveWrapper(robot.REVERSE, 4, false);
 
             reOrient();  // will change orientation based on alliance color
 
-            linearMoveWrapper(robot.REVERSE, MAX_SPEED*0.3, 5);
+            linearMoveWrapper(CompetitionHardware.Direction.REVERSE, MAX_SPEED*0.3, 5);
 
             // Grab and pull the platform
             Hooks rbHooks = new Hooks(hardwareMap);
@@ -126,7 +126,7 @@ public class AutonTestEx extends BasicAuton {
 
             // pull platform back
             //linearMoveWrapper(robot.FORWARD, 32, false);
-            linearMoveWrapper(robot.FORWARD, MAX_SPEED*0.8, 36);
+            linearMoveWrapper(CompetitionHardware.Direction.FORWARD, MAX_SPEED*0.8, 36);
 
             rbHooks.stop();
             rbHooks.release();
@@ -134,14 +134,14 @@ public class AutonTestEx extends BasicAuton {
             rbHooks.stop();
 
             // push platform to the corner
-            linearMoveWrapper(robot.RIGHT, MAX_SPEED,32);
-            linearMoveWrapper(robot.REVERSE, MAX_SPEED,19);
-            linearMoveWrapper(robot.LEFT, MAX_SPEED,6.5);
+            linearMoveWrapper(CompetitionHardware.Direction.RIGHT, MAX_SPEED,32);
+            linearMoveWrapper(CompetitionHardware.Direction.REVERSE, MAX_SPEED,19);
+            linearMoveWrapper(CompetitionHardware.Direction.LEFT, MAX_SPEED,6.5);
 
             // retreat and park under the bridge
 
-            linearMoveWrapper(robot.FORWARD, MAX_SPEED,19);
-            linearMoveWrapper(robot.RIGHT, MAX_SPEED,25);
+            linearMoveWrapper(CompetitionHardware.Direction.FORWARD, MAX_SPEED,19);
+            linearMoveWrapper(CompetitionHardware.Direction.RIGHT, MAX_SPEED,25);
 
             telemetry.addData("Path", "Complete :))))");
             telemetry.update();
