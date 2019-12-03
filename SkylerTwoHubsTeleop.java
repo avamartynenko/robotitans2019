@@ -75,6 +75,8 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
         robot.backArm.moveToHomePosition();
 
 
+
+
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
         telemetry.update();
@@ -173,14 +175,15 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
             //gamepad 2 starts here
 
 
+
             //front side auton arm
             if(gamepad2.y){
 
-                robot.frontArm.liftUp(0.8);
+                robot.frontArm.liftUp(1);
             }
             else if(gamepad2.a){
 
-                robot.frontArm.goDown(0.8);
+                robot.frontArm.goDown(1);
             }
             else {
 
@@ -190,11 +193,11 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
             if(gamepad2.x){
 
-                robot.frontArm.releaseStone(0.8);
+                robot.frontArm.releaseStone(1);
             }
             else if(gamepad2.b){
 
-                robot.frontArm.latchStone(0.8);
+                robot.frontArm.latchStone(1);
             }
             else{
 

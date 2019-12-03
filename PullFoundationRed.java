@@ -84,16 +84,26 @@ public class PullFoundationRed extends BasicAuton {
         if (opModeIsActive())
         {
             reOrient();
-            robot.linearMove(robot.LEFT,0.6,11);
+            //robot.linearMove(robot.LEFT,0.6,11);
             robot.linearMove(robot.REVERSE,0.6,32);
-            robot.hookLatch.latch();
-            robot.gyroMove(robot.GYRO_LEFT,0.5,05);
-            telemetry.addData("Status", "latched on");    //
-            telemetry.update();
+            robot.linearMove(robot.REVERSE,0.1,2);
             sleep(1000);
-            robot.linearMove(robot.FORWARD,0.3,38);
+            robot.hookLatch.latch();
+            robot.gyroMove(robot.GYRO_RIGHT,0.2,15);
+            sleep(1000);
+            robot.linearMove(robot.FORWARD,0.6,25);
+            robot.gyroMove(robot.GYRO_RIGHT,0.2,75);
+            robot.linearMove(robot.REVERSE,0.6,5);
             robot.hookLatch.release();
-            robot.linearMove(robot.RIGHT,0.6,60);
+            robot.linearMove(robot.LEFT,0.7,15);
+            //robot.linearMove(robot.LEFT,0.5,8);
+            robot.linearMove(robot.FORWARD,0.6,45);
+            sleep(20000);
+
+
+
+
+
 
 
         }
