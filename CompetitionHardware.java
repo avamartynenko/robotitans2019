@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Color;
 import android.util.Log;
+import android.support.annotation.Nullable;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -41,6 +42,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -114,12 +116,14 @@ public class CompetitionHardware
 
     public final double MAX_SPEED = 1;          // defines max robot speed. set to 1 for normal operation, .5 for debugging to observer robot moves in slow motion
     public final double TURN_ERROR = 43;        // Robot over rotates by approximaterly 45 degrees if directed to turn 90 degrees at full speed
-    public final double NO_ERROR_SPEED = .14;   // max speed at which robot turns correctly, robot may not move any any speed less than .14
+    public final double NO_ERROR_SPEED = .2;   // max speed at which robot turns correctly, robot may not move any any speed less than .14
     public final double STOP_GAP = 2;           // even at smallest possible speed there is still lag in processing wich results in overrun in case if power is killed once the angle is reach
                                                 // we need to kill power 3 degrees ahead of target angle to achive accurate turn angle
                                                 // STPO_GAP is dependent on turn speed and robot configuration and will need to be reset in case if robot configuraiton is changed
     public final long OVERRAN_SLEEP_TIME = 50;  // how long robot should sleep for in uncontrolled spin before checking if it is stabilized
     public final double PRECISION_TURN_ZONE = TURN_ERROR/2;    // skip fast turn, turn at slowest speed instead
+
+    public final double STOP_THRESHOLD = .25;   // min XY accell below which we consider that robot is stationary
 
     private boolean gyroInitialized = false;
 
@@ -136,6 +140,10 @@ public class CompetitionHardware
 
     /* Constructor */
     public CompetitionHardware(){
+        // Set PID proportional value to start reducing power at about 50 degrees of rotation.
+        // P by itself may stall before turn completed so we add a bit of I (integral) which
+        // causes the PID controller to gently increase power if the turn is not completed.
+        pidRotate = new PIDController(.003, .00003, 0);
     }
 
     /* Initialize standard Hardware interfaces */
@@ -193,7 +201,6 @@ public class CompetitionHardware
 
         }
         else {
-
             /// Stop and Reset ENCODER
             backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -249,17 +256,31 @@ public class CompetitionHardware
         colorsense.enableLed(true);
     }
 
-    public int linearMove (Direction direction,double speed, double distance) {
+    public int linearMove (Direction direction, double speed, double distance) {
+        return linearMove(direction, speed, distance, null);
+    }
+
+    public int linearMove (Direction direction, double speed, double distance, @Nullable LinearOpMode opMode) {
         int newBleftTarget;
         int newBrightTarget;
         int newFleftTarget;
         int newFrightTarget;
+
+        // encoder position does not get reset between program starts
+        // motors can start in random positions if robot was not restarted after completion of previous program
+        if(activateSpeedProfile)
+            setEncoder(true);
 
         // Determine new target position, and pass to motor controller
         newBleftTarget = backLeft.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
         newBrightTarget = backRight.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
         newFleftTarget = frontLeft.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
         newFrightTarget = frontRight.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
+
+        if(opMode != null) {
+            opMode.telemetry.log().add("Linear move direction: " + direction2string(direction) + ". Distance: " + distance + " inches");
+            opMode.telemetry.log().add("Speed profile " + (activateSpeedProfile ? "ON" : "OFF"));
+        }
 
         setDirection(direction);
 
@@ -283,7 +304,7 @@ public class CompetitionHardware
                 Thread.yield();
             }
         } else {
-            set4WDriveWithSpeedProfile(Math.abs(speed), newBleftTarget, backLeft);
+            set4WDriveWithSpeedProfile(direction, Math.abs(speed), newBleftTarget, backLeft, opMode);
         }
 
         // Stop all motion - TODO test if it actually works - encoder run to position might actually stop motors
@@ -298,24 +319,161 @@ public class CompetitionHardware
         return newBleftTarget;
     }
 
-    public void set4WDriveWithSpeedProfile(double speed, int target, DcMotor motor){
-        double profileSpeed = 0.0;
-        double speedIncrement = 0.007;
-        int curPostion = motor.getCurrentPosition();
+    public void set4WDriveWithSpeedProfile(Direction direction, double speed, int target, DcMotor motor, LinearOpMode opMode) {
+        boolean original_logic = false;
 
-        while(curPostion <= target){
+        if(original_logic) {
+            double profileSpeed = 0.0;
+            double speedIncrement = 0.007;
+            int curPostion = motor.getCurrentPosition();
 
-            if(curPostion < target/2){
-                profileSpeed = profileSpeed + speedIncrement;
-            } else{
-                profileSpeed = profileSpeed - speedIncrement;
+            while (curPostion <= target) {
+
+                if (curPostion < target / 2) {
+                    profileSpeed = profileSpeed + speedIncrement;
+                } else {
+                    profileSpeed = profileSpeed - speedIncrement;
+                }
+
+                if (profileSpeed > speed) profileSpeed = speed;
+                if (profileSpeed < 0.0) profileSpeed = 0.0;
+
+                setPower4WDrive(profileSpeed);
+                curPostion = motor.getCurrentPosition();
+            }
+        }
+        else {
+            double accelerationTime = 350;
+            double breakDistance = 0;
+            double currentSpeed = 0;
+            double minBreakSpeed = 0;
+            double correctedTarget = target;
+            double posIncrement = 0;
+            double initialHeading = getAbsoluteHeading();
+
+            switch (direction) {
+                case FORWARD:
+                case REVERSE:
+                    minBreakSpeed = .25;
+                    breakDistance = 450;
+                    break;
+                case LEFT:
+                case RIGHT:
+                    minBreakSpeed = .25;
+                    breakDistance = 200;
+                    break;
             }
 
-            if(profileSpeed > speed) profileSpeed = speed;
-            if(profileSpeed < 0.0) profileSpeed = 0.0;
+            switch (direction) {
+                case LEFT:
+                    posIncrement = (backLeft.getTargetPosition() - backLeft.getCurrentPosition())*.15;
+                    correctedTarget += posIncrement;
+                    break;
+                case RIGHT:
+                    posIncrement = (backLeft.getTargetPosition() - backLeft.getCurrentPosition())*.15;
+                    correctedTarget += posIncrement;
+                    break;
+                default:
+                   break;
+            }
 
-            setPower4WDrive(profileSpeed);
-            curPostion = motor.getCurrentPosition();
+            backLeft.setTargetPosition(backLeft.getTargetPosition() + (int)posIncrement);
+            backRight.setTargetPosition(backRight.getTargetPosition() + (int)posIncrement);
+            frontLeft.setTargetPosition(frontLeft.getTargetPosition() + (int)posIncrement);
+            frontRight.setTargetPosition(frontRight.getTargetPosition() + (int)posIncrement);
+
+            resetAngle();
+            PIDController pidDrive = new PIDController(.20, 0, 0);
+            // Set up parameters for driving in a straight line.
+
+            pidDrive.setSetpoint(getAngle());
+            pidDrive.setOutputRange(0, speed);
+            pidDrive.setInputRange(-90, 90);
+            pidDrive.enable();
+
+            double correction = 0;
+
+            if(opMode != null) {
+                opMode.telemetry.log().add("Postions bl " + backLeft.getCurrentPosition() + " br " + backRight.getCurrentPosition() + " fl " + frontLeft.getCurrentPosition() + " fr " + frontRight.getCurrentPosition());
+                opMode.telemetry.log().add("Heading " + getActualHeading() + ". Angle: " + getAngle());
+                opMode.telemetry.log().add("Target original/corrected " + target + "/" + correctedTarget);
+            }
+
+            int curPostion = motor.getCurrentPosition();
+            ElapsedTime et = new ElapsedTime();
+            while (curPostion <= (correctedTarget - breakDistance) && opMode.opModeIsActive()) {
+                // Use PID with imu input to drive in a straight line.
+                correction = 0;
+
+                curPostion = motor.getCurrentPosition();
+                currentSpeed = Range.clip(Math.min(accelerationTime, et.milliseconds()) / accelerationTime, .20, 1);
+
+                if(et.milliseconds() >= accelerationTime)
+                    correction = pidDrive.performPID(getAngle());
+
+                if(direction == Direction.REVERSE || direction == Direction.RIGHT)
+                    correction *= -1;
+
+                setPower4WDrive(  Range.clip(currentSpeed - correction, -1, 1),
+                        Range.clip(currentSpeed + correction, -1, 1),
+                        Range.clip(currentSpeed - correction, -1, 1),
+                        Range.clip(currentSpeed + correction, -1, 1));
+            }
+
+            if(opMode != null) {
+                opMode.telemetry.log().add("Final correction " + correction);
+                opMode.telemetry.log().add("Pre break heading " + getActualHeading());
+                opMode.telemetry.log().add("Prebreak position bl " + backLeft.getCurrentPosition() + " br " + backRight.getCurrentPosition() + " fl " + frontLeft.getCurrentPosition() + " fr " + frontRight.getCurrentPosition());
+            }
+
+            double maxTravelSpeed = currentSpeed; // capture current speed
+
+            // stop braking as soon as at least one motor will reach target position
+            while (
+                    backLeft.getCurrentPosition() < backLeft.getTargetPosition() &&
+                    backRight.getCurrentPosition() < backRight.getTargetPosition() &&
+                    frontLeft.getCurrentPosition() < frontLeft.getTargetPosition() &&
+                    frontRight.getCurrentPosition() < frontRight.getTargetPosition() &&
+                    opMode.opModeIsActive()
+            ) {
+                double slowDownCorrection = 0;
+                // Use PID with imu input to drive in a straight line.
+                currentSpeed = Math.max((correctedTarget-curPostion)/breakDistance, minBreakSpeed);
+
+                if(direction == Direction.FORWARD || direction == Direction.REVERSE)
+                    slowDownCorrection = pidDrive.performPID(getAngle());
+                else
+                    slowDownCorrection = correction*currentSpeed;
+
+                curPostion = motor.getCurrentPosition();
+                if(direction == Direction.REVERSE || direction == Direction.RIGHT)
+                    slowDownCorrection *= -1;
+
+                setPower4WDrive(  Range.clip(currentSpeed - slowDownCorrection, -1, 1),
+                        Range.clip(currentSpeed + slowDownCorrection, -1, 1),
+                        Range.clip(currentSpeed - slowDownCorrection, -1, 1),
+                        Range.clip(currentSpeed + slowDownCorrection, -1, 1));
+            }
+
+            // stop
+            setPower4WDrive(0);
+            waitToStop();
+
+            double correctionAngle = calcTurnAngleD(initialHeading, getAbsoluteHeading());
+
+            if(opMode != null) {
+                opMode.telemetry.log().add("Postions bl " + backLeft.getCurrentPosition() + " br " + backRight.getCurrentPosition() + " fl " + frontLeft.getCurrentPosition() + " fr " + frontRight.getCurrentPosition());
+                opMode.telemetry.log().add("Final heading/correction angle " + getActualHeading() + "/" + correctionAngle);
+            }
+
+            // correct angle
+            if(correctionAngle != 0) {
+                Direction correctionAngleDirection = (correctionAngle < 0) ? Direction.GYRO_LEFT : Direction.GYRO_RIGHT;
+                //gyroMove2(correctionAngleDirection, correctionAngle, speed, opMode.telemetry);
+                //gyroMovePID((int) correctionAngle, speed, opMode);
+                gyroMoveByOffset(correctionAngleDirection, 1, Math.abs(correctionAngle), opMode);
+            }
+
         }
 
         setPower4WDrive(0);
@@ -324,6 +482,36 @@ public class CompetitionHardware
 
     public void setPower4WDrive(double speed){
         setPower4WDrive(speed,speed,speed,speed);
+    }
+
+    public void gyroMoveByOffset(Direction direction, double speed, double degrees, LinearOpMode opMode) {
+        opMode.telemetry.log().add("Initial heading: " + getActualHeading());
+        setDirection(direction);
+        setEncoder(true);
+
+        int positionIncrement = (int) (degrees * 1000 / 60); // 60 degress ~ 1000 steps
+
+        frontLeft.setTargetPosition(positionIncrement);
+        frontRight.setTargetPosition(positionIncrement);
+        backLeft.setTargetPosition(positionIncrement);
+        backRight.setTargetPosition(positionIncrement);
+
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        setPower4WDrive(speed);
+
+        while (backLeft.isBusy() && backRight.isBusy() && frontLeft.isBusy() && frontRight.isBusy()) {
+            // just waiting when motors are busy
+            Thread.yield();
+        }
+
+        setPower4WDrive(0);
+        waitToStop();
+
+        opMode.telemetry.log().add("Final heading: " + getActualHeading());
     }
 
     // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
@@ -474,7 +662,7 @@ public class CompetitionHardware
      * Rotate left or right the number of degrees. Does not support turning more than 359 degrees.
      * @param degrees Degrees to turn, + is left - is right
      */
-    private void gyroMovePID(int degrees, double power, LinearOpMode opMode)
+    public void gyroMovePID(int degrees, double power, LinearOpMode opMode)
     {
         // restart imu angle tracking.
         resetAngle();
@@ -557,7 +745,7 @@ public class CompetitionHardware
      * Get current cumulative angle rotation from last reset.
      * @return Angle in degrees. + = left, - = right from zero point.
      */
-    private double getAngle()
+    public double getAngle()
     {
         // We experimentally determined the Z axis is the axis we want to use for heading angle.
         // We have to process the angle because the imu works in euler angles so the Z axis is
@@ -759,6 +947,12 @@ public class CompetitionHardware
         }
 
         return sResult;
+    }
+
+    private void waitToStop() {
+        while (Math.sqrt(Math.pow(imu.getLinearAcceleration().xAccel, 2) + Math.pow(imu.getLinearAcceleration().yAccel,2)) > STOP_THRESHOLD) {
+            Thread.yield();
+        }
     }
 
 }
