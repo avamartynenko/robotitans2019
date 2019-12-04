@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.app.Activity;
-
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -89,6 +88,12 @@ public class BasicAuton extends LinearOpMode {
     ElapsedTime opmodeRunTime = new ElapsedTime();
     SensorManager sManager;
     BlockingQueue que;
+
+    public void setInitVuforia(boolean initVuforia) {
+        this.initVuforia = initVuforia;
+    }
+
+    public boolean initVuforia = false;
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
      * localization engine.
@@ -169,7 +174,7 @@ public class BasicAuton extends LinearOpMode {
 
         setChoiceOfArm();
 
-        //initVuforia();
+        if(initVuforia) initVuforia();
     }
 
     public int detectSkyStone() {
