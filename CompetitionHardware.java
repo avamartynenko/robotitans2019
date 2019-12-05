@@ -38,6 +38,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -52,6 +53,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static java.lang.Thread.sleep;
 
 
@@ -202,10 +206,10 @@ public class CompetitionHardware
         }
         else {
             /// Stop and Reset ENCODER
-            backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            backLeft.setMode(STOP_AND_RESET_ENCODER);
+            frontLeft.setMode(STOP_AND_RESET_ENCODER);
+            frontRight.setMode(STOP_AND_RESET_ENCODER);
+            backRight.setMode(STOP_AND_RESET_ENCODER);
 
             //RUN USING ENCODER
             backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -290,16 +294,16 @@ public class CompetitionHardware
         frontRight.setTargetPosition(newFrightTarget);
 
         // Turn On RUN_TO_POSITION
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(RUN_TO_POSITION);
+        backRight.setMode(RUN_TO_POSITION);
+        frontLeft.setMode(RUN_TO_POSITION);
+        frontRight.setMode(RUN_TO_POSITION);
 
         if (!activateSpeedProfile) {
             //Setting the power
             setPower4WDrive(Math.abs(speed));
 
-            while (backLeft.isBusy() && backRight.isBusy() && frontLeft.isBusy() && frontRight.isBusy()) {
+            while (backLeft.isBusy() || backRight.isBusy() || frontLeft.isBusy() || frontRight.isBusy()) {
                 // just waiting when motors are busy
                 Thread.yield();
             }
@@ -309,7 +313,7 @@ public class CompetitionHardware
 
         // Stop all motion - TODO test if it actually works - encoder run to position might actually stop motors
         if(!linkMoves) {
-            setZeroPowerMode(DcMotor.ZeroPowerBehavior.BRAKE);
+            setZeroPowerMode(BRAKE);
             setPower4WDrive(0);
             setEncoder(true);
         }
@@ -351,6 +355,7 @@ public class CompetitionHardware
             double posIncrement = 0;
             double initialHeading = getAbsoluteHeading();
 
+            // set min break speed and break distance
             switch (direction) {
                 case FORWARD:
                 case REVERSE:
@@ -364,6 +369,7 @@ public class CompetitionHardware
                     break;
             }
 
+            // set postion increment for straif
             switch (direction) {
                 case LEFT:
                     posIncrement = (backLeft.getTargetPosition() - backLeft.getCurrentPosition())*.15;
@@ -401,7 +407,7 @@ public class CompetitionHardware
 
             int curPostion = motor.getCurrentPosition();
             ElapsedTime et = new ElapsedTime();
-            while (curPostion <= (correctedTarget - breakDistance) && opMode.opModeIsActive()) {
+            while (curPostion <= Math.max(correctedTarget - breakDistance, correctedTarget/2) && opMode.opModeIsActive()) {
                 // Use PID with imu input to drive in a straight line.
                 correction = 0;
 
@@ -429,13 +435,7 @@ public class CompetitionHardware
             double maxTravelSpeed = currentSpeed; // capture current speed
 
             // stop braking as soon as at least one motor will reach target position
-            while (
-                    backLeft.getCurrentPosition() < backLeft.getTargetPosition() &&
-                    backRight.getCurrentPosition() < backRight.getTargetPosition() &&
-                    frontLeft.getCurrentPosition() < frontLeft.getTargetPosition() &&
-                    frontRight.getCurrentPosition() < frontRight.getTargetPosition() &&
-                    opMode.opModeIsActive()
-            ) {
+            while (!oneMotorAtTarget() && opMode.opModeIsActive()) {
                 double slowDownCorrection = 0;
                 // Use PID with imu input to drive in a straight line.
                 currentSpeed = Math.max((correctedTarget-curPostion)/breakDistance, minBreakSpeed);
@@ -466,18 +466,28 @@ public class CompetitionHardware
                 opMode.telemetry.log().add("Final heading/correction angle " + getActualHeading() + "/" + correctionAngle);
             }
 
-            // correct angle
-            if(correctionAngle != 0) {
-                Direction correctionAngleDirection = (correctionAngle < 0) ? Direction.GYRO_LEFT : Direction.GYRO_RIGHT;
-                //gyroMove2(correctionAngleDirection, correctionAngle, speed, opMode.telemetry);
-                //gyroMovePID((int) correctionAngle, speed, opMode);
-                gyroMoveByOffset(correctionAngleDirection, 1, Math.abs(correctionAngle), opMode);
-            }
-
+            correctHeading(initialHeading, opMode);
         }
 
+        ElapsedTime et = new ElapsedTime();
         setPower4WDrive(0);
         setEncoder(true);
+        opMode.telemetry.log().add("Motors reset time: " + et.milliseconds());
+    }
+
+    protected boolean oneMotorAtTarget() {
+        return  backLeft.getCurrentPosition() >= backLeft.getTargetPosition() ||
+                backRight.getCurrentPosition() >= backRight.getTargetPosition() ||
+                frontLeft.getCurrentPosition() >= frontLeft.getTargetPosition() ||
+                frontRight.getCurrentPosition() >= frontRight.getTargetPosition();
+    }
+
+    public void correctHeading(double initialHeading, LinearOpMode opMode) {
+        double correctionAngle = calcTurnAngleD(initialHeading, getAbsoluteHeading());
+        if(correctionAngle != 0) {
+            Direction correctionAngleDirection = (correctionAngle < 0) ? Direction.GYRO_LEFT : Direction.GYRO_RIGHT;
+            gyroMoveByOffset(correctionAngleDirection, 1, Math.abs(correctionAngle), opMode);
+        }
     }
 
     public void setPower4WDrive(double speed){
@@ -485,29 +495,36 @@ public class CompetitionHardware
     }
 
     public void gyroMoveByOffset(Direction direction, double speed, double degrees, LinearOpMode opMode) {
-        opMode.telemetry.log().add("Initial heading: " + getActualHeading());
+        if(degrees < STOP_GAP)  // robot has issue correcting very small angles like 0.06 degrees :)
+            return;
+
         setDirection(direction);
         setEncoder(true);
 
         int positionIncrement = (int) (degrees * 1000 / 60); // 60 degress ~ 1000 steps
+        opMode.telemetry.log().add("Gyro/offset Initial heading/tics " + getActualHeading() + "/" + positionIncrement);
 
         frontLeft.setTargetPosition(positionIncrement);
         frontRight.setTargetPosition(positionIncrement);
         backLeft.setTargetPosition(positionIncrement);
         backRight.setTargetPosition(positionIncrement);
 
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setMotorsMode(RUN_TO_POSITION);
 
         setPower4WDrive(speed);
 
-        while (backLeft.isBusy() && backRight.isBusy() && frontLeft.isBusy() && frontRight.isBusy()) {
+        while (!oneMotorAtTarget()) {
             // just waiting when motors are busy
-            Thread.yield();
+            try {
+                Thread.sleep(10);
+            }
+            catch (InterruptedException ex) {
+                opMode.telemetry.log().add("Failed in sleep");
+            }
         }
 
+        setZeroPowerMode(BRAKE);
+        setMotorsMode(STOP_AND_RESET_ENCODER);
         setPower4WDrive(0);
         waitToStop();
 
@@ -690,7 +707,7 @@ public class CompetitionHardware
         // clockwise (right).
 
         setDirection(Direction.FORWARD);
-        setZeroPowerMode(DcMotor.ZeroPowerBehavior.BRAKE);
+        setZeroPowerMode(BRAKE);
 
         // rotate until turn is completed.
         try {
@@ -822,8 +839,8 @@ public class CompetitionHardware
         motor2.setTargetPosition(wheel2Target);
 
         // Turn On RUN_TO_POSITION
-        motor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        motor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motor1.setMode(RUN_TO_POSITION);
+        motor2.setMode(RUN_TO_POSITION);
 
         //Setting the power
         motor1.setPower(speed);
@@ -877,7 +894,7 @@ public class CompetitionHardware
         testMotor.setTargetPosition(testTarget);
 
         // Turn On RUN_TO_POSITION
-        testMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        testMotor.setMode(RUN_TO_POSITION);
 
         if (!activateSpeedProfile) {
 
@@ -901,7 +918,14 @@ public class CompetitionHardware
         backLeft.setZeroPowerBehavior(behavior);
         backRight.setZeroPowerBehavior(behavior);
         frontLeft.setZeroPowerBehavior(behavior);
-        frontLeft.setZeroPowerBehavior(behavior);
+        frontRight.setZeroPowerBehavior(behavior);
+    }
+
+    public void setMotorsMode(RunMode mode) {
+        frontRight.setMode(mode);
+        frontLeft.setMode(mode);
+        backRight.setMode(mode);
+        backLeft.setMode(mode);
     }
 
     private String direction2string(Direction direction) {

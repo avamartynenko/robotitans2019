@@ -84,12 +84,12 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 @Autonomous(name="BLUE_VuforiaTestSkyStone", group ="Concept")
 //@Disabled
-public class VuforiaTestSkyStone_Blue extends VuforiaTestSkyStoneR {
+public class VuforiaTestSkyStone_Blue extends VuforiaTestSkyStone {
 
     public VuforiaTestSkyStone_Blue(){
 
         super.setAllianceColor(BasicAuton.GAME_ALLIANCE_BLUE);
-        super.setBlueAllianceOffset(true);
+        //super.setBlueAllianceOffset(true);
     }
 
 }
