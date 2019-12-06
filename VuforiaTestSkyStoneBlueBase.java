@@ -50,7 +50,9 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.FORWARD;
+import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.REVERSE;
+import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT;
 
 /**
  * This 2019-2020 OpMode illustrates the basics of using the Vuforia localizer to determine
@@ -83,9 +85,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
  */
 
 
-@Autonomous(name="Old_VuforiaTestSkyStone", group ="Concept")
-@Disabled
-public class VuforiaTestSkyStoneR extends BasicAuton {
+@Autonomous(name="BLUE_VuforiaTestSkyStone", group ="Competition")
+//@Disabled
+public class VuforiaTestSkyStoneBlueBase extends BasicAuton {
+
+
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
@@ -94,8 +98,6 @@ public class VuforiaTestSkyStoneR extends BasicAuton {
     //
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = FRONT;
     private static final boolean PHONE_IS_PORTRAIT = true  ;
-
-    public boolean blueAllianceOffset = false;
 
 
     /*
@@ -152,6 +154,7 @@ public class VuforiaTestSkyStoneR extends BasicAuton {
 
     @Override public void runOpMode() {
 
+        super.setAllianceColor(GAME_ALLIANCE_BLUE);
         super.initialize();
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
@@ -302,9 +305,6 @@ public class VuforiaTestSkyStoneR extends BasicAuton {
         }
 
         CameraDevice.getInstance().setFlashTorchMode(true);
-        telemetry.addData("FLASH ON", "It's ready");
-        telemetry.update();
-
 
         // Rotate the phone vertical about the X axis if it's in portrait mode
         if (PHONE_IS_PORTRAIT) {
@@ -326,6 +326,9 @@ public class VuforiaTestSkyStoneR extends BasicAuton {
             ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
         }
 
+        telemetry.addLine("Vuforia is ready");
+        telemetry.update();
+
         // WARNING:
         // In this sample, we do not wait for PLAY to be pressed.  Target Tracking is started immediately when INIT is pressed.
         // This sequence is used to enable the new remote DS Camera Preview feature to be used with this sample.
@@ -340,8 +343,8 @@ public class VuforiaTestSkyStoneR extends BasicAuton {
 
         targetsSkyStone.activate();
 
-        robot.linearMove(CompetitionHardware.Direction.FORWARD,slowMoSpeed,6);
-        robot.linearMove(CompetitionHardware.Direction.RIGHT,slowMoSpeed,18.5);
+        robot.linearMove(FORWARD, slowMoSpeed,5);
+        robot.linearMove(RIGHT, slowMoSpeed,18.5);
         sleep(detectionWaitTime);
 
         if (opModeIsActive()) {
@@ -380,7 +383,7 @@ public class VuforiaTestSkyStoneR extends BasicAuton {
                 } else {
                     targetPostion++;
                     telemetry.addData("Visible Target", "none");
-                    robot.linearMove(CompetitionHardware.Direction.REVERSE, slowMoSpeed, 8);
+                    robot.linearMove(REVERSE, slowMoSpeed, 6);
                     sleep(detectionWaitTime);
                 }
 
@@ -403,33 +406,28 @@ public class VuforiaTestSkyStoneR extends BasicAuton {
 
     public void repositionAndPickupSkystone(){
 
-        robot.linearMove(CompetitionHardware.Direction.REVERSE, slowMoSpeed, 5);
-        robot.linearMove(CompetitionHardware.Direction.RIGHT, slowMoSpeed, 8);
+        robot.linearMove(REVERSE, slowMoSpeed, 5);
+        robot.linearMove(RIGHT, slowMoSpeed, 8);
         //pickUpSkyStone();
         choiceOfArm.latchStone(1.0);
         choiceOfArm.goDown(1.0);
-        sleep(1000); // 20000
+        sleep(1000);
         //robot.linearMove(robot.RIGHT, slowMoSpeed, 4);
         choiceOfArm.liftUp(1.0);
+        sleep(1000);
     }
 
     public void deliverStone(){
-        if(!blueAllianceOffset) robot.linearMove(CompetitionHardware.Direction.LEFT, slowMoSpeed, safeDistanceOffset);
-        sleep(750); //750
+        //robot.linearMove(CompetitionHardware.Direction.LEFT, slowMoSpeed, safeDistanceOffset);
+        //sleep(750);
         double initialOffset = 8 * (2 - targetPostion); // stone dimentions are 8x4x5
-        if(!blueAllianceOffset) {
-            robot.linearMove(CompetitionHardware.Direction.REVERSE, MAX_SPEED, dropZoneOffset - 16 + initialOffset);
-            robot.linearMove(CompetitionHardware.Direction.RIGHT, slowMoSpeed, 4);
-
-        } {
-            robot.linearMove(CompetitionHardware.Direction.REVERSE, MAX_SPEED, dropZoneOffset - 20 + initialOffset);
-            robot.linearMove(CompetitionHardware.Direction.RIGHT, slowMoSpeed, 15);
-
+        if(allianceColor == GAME_ALLIANCE_RED) {
+            robot.activateSpeedProfile = true;
+            //robot.correctHeading(0, this);
         }
-        //sleep(3050); //750
-
-        //sleep(3050); //750
-
+        robot.linearMove(REVERSE, MAX_SPEED, dropZoneOffset - 20 + initialOffset, this);
+        robot.activateSpeedProfile = false;
+        robot.linearMove(RIGHT, slowMoSpeed, 15, this);
 
         placeSkyStoneOnFoundation();
 
@@ -438,17 +436,11 @@ public class VuforiaTestSkyStoneR extends BasicAuton {
         // pullback and rotate
         linearMoveWrapper(CompetitionHardware.Direction.LEFT, MAX_SPEED*0.6, 3);
         //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
-
-        if(!blueAllianceOffset) {
-            robot.gyroMove(CompetitionHardware.Direction.GYRO_LEFT, MAX_SPEED*0.8,75);
-        } else {
-            robot.gyroMove(CompetitionHardware.Direction.GYRO_LEFT, MAX_SPEED*0.8,65);
-        }
-
+        robot.gyroMove(CompetitionHardware.Direction.GYRO_LEFT, MAX_SPEED*0.8,65);
 
         reOrient();  // will change orientation based on alliance color
 
-        linearMoveWrapper(CompetitionHardware.Direction.REVERSE, slowMoSpeed, 4);
+        linearMoveWrapper(REVERSE, slowMoSpeed, 10);
 
         // Grab and pull the platform
         robot.hookLatch.latch();
@@ -456,23 +448,18 @@ public class VuforiaTestSkyStoneR extends BasicAuton {
 
         // pull platform back
         //linearMoveWrapper(robot.FORWARD, 32, false);
-        linearMoveWrapper(CompetitionHardware.Direction.FORWARD, MAX_SPEED, 36);
+        linearMoveWrapper(FORWARD, MAX_SPEED, 36);
 
         robot.hookLatch.release();
 
         // push platform to the corner
-        linearMoveWrapper(CompetitionHardware.Direction.RIGHT, MAX_SPEED,37);
+        linearMoveWrapper(RIGHT, MAX_SPEED,37);
 
-        linearMoveWrapper(CompetitionHardware.Direction.REVERSE, MAX_SPEED,23);
+        linearMoveWrapper(REVERSE, MAX_SPEED,22);
 
         // retreat and park under the bridge
-        if(!blueAllianceOffset) {
-            linearMoveWrapper(CompetitionHardware.Direction.RIGHT, MAX_SPEED, 22);
-        } else {
-            linearMoveWrapper(CompetitionHardware.Direction.RIGHT, MAX_SPEED, 15);
 
-        }
-
+        linearMoveWrapper(RIGHT, MAX_SPEED,17);
     }
 
     public void goForSecondStone(){
@@ -496,9 +483,5 @@ public class VuforiaTestSkyStoneR extends BasicAuton {
 
         // robot.linearMove(robot.LEFT, slowMoSpeed, safeDistanceOffset);
         // robot.linearMove(robot.FORWARD, MAX_SPEED, 40);
-    }
-
-    public void setBlueAllianceOffset(boolean blueAllianceOffset) {
-        this.blueAllianceOffset = blueAllianceOffset;
     }
 }

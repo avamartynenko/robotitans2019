@@ -143,7 +143,7 @@ public class PIDController
      * This is always centered on zero and constrained the the max and min outs
      * @return the latest calculated output
      */
-    double performPID(double input)
+    public double performPID(double input)
     {
         setInput(input);
         return performPID();
@@ -178,7 +178,7 @@ public class PIDController
      * @param minimumInput the minimum value expected from the input, always positive
      * @param maximumInput the maximum value expected from the output, always positive
      */
-    void setInputRange(double minimumInput, double maximumInput)
+    public void setInputRange(double minimumInput, double maximumInput)
     {
         m_minimumInput = Math.abs(minimumInput);
         m_maximumInput = Math.abs(maximumInput);
@@ -191,7 +191,7 @@ public class PIDController
      * @param minimumOutput the minimum value to write to the output, always positive
      * @param maximumOutput the maximum value to write to the output, always positive
      */
-    void setOutputRange(double minimumOutput, double maximumOutput)
+    public void setOutputRange(double minimumOutput, double maximumOutput)
     {
         m_minimumOutput = Math.abs(minimumOutput);
         m_maximumOutput = Math.abs(maximumOutput);
@@ -201,7 +201,7 @@ public class PIDController
      * Set the setpoint for the PIDController
      * @param setpoint the desired setpoint
      */
-    void setSetpoint(double setpoint)
+    public void setSetpoint(double setpoint)
     {
         int     sign = 1;
 
@@ -262,7 +262,7 @@ public class PIDController
     /**
      * Begin running the PIDController
      */
-    void enable()
+    public void enable()
     {
         m_enabled = true;
     }

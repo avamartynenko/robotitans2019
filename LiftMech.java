@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class LiftMech {
 
@@ -16,7 +14,7 @@ public class LiftMech {
     public final int DOWN = 2;
     public double UP_SPEED = 0.0;
     public double DOWN_SPEED = 0.5;
-    public double GRABBER_LOCK_POSITION = 0.90; //
+    public double GRABBER_LOCK_POSITION = 0.95; //
     public double GRABBER_RELEASE_POSITION = 0.4; // 0.2
     public double TWISTER_HOME_POSITION = 1.0; //
     public double TWISTER_DELIVER_POSITION = 0.25;

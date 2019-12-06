@@ -30,8 +30,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Color;
-import android.util.Log;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -39,9 +39,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotor.RunMode;
+import com.qualcomm.robotcore.hardware.DcMotorControllerEx;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -54,6 +57,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static java.lang.Thread.sleep;
@@ -82,6 +87,13 @@ public class CompetitionHardware
     public DcMotor frontLeft = null;
     public DcMotor backLeft = null;
     public DcMotor backRight = null;
+
+    // oritnal values (p=1.169998 i=0.117004 d=0.000000 f=11.699997 alg=PIDF)
+    public static final double NEW_P = 1.5;
+    public static final double NEW_I = 0.117;
+    public static final double NEW_D = 0.2;
+    public static final double NEW_F = 11.699997;
+
     public ColorSensor colorsense = null;
     private boolean hasHook = true;
     private boolean hasArm = true;
@@ -129,9 +141,8 @@ public class CompetitionHardware
 
     public final double STOP_THRESHOLD = .25;   // min XY accell below which we consider that robot is stationary
 
+    // variables for using gyro
     private boolean gyroInitialized = false;
-
-    // variables for using gryo
     Orientation angles;
     public BNO055IMU        imu;
     private Orientation     lastAngles = new Orientation();
@@ -158,6 +169,10 @@ public class CompetitionHardware
         backRight = hwMap.get(DcMotor.class, "backRight");
         frontRight = hwMap.get(DcMotor.class, "frontRight");
         frontLeft = hwMap.get(DcMotor.class, "frontLeft");
+
+        // Fix for 5.3 firmware
+        changePIDCoefficients(RUN_USING_ENCODER, 10, 3, 0);
+        changePIDCoefficients(RUN_TO_POSITION , 10, 0.05, 0);
 
         if (hasHook) hookLatch = new Hooks(hwMap);
         if (hasArm) frontArm = new Arm(hwMap,Arm.FRONT_ARM);
@@ -198,10 +213,10 @@ public class CompetitionHardware
             // Set all motors to run without encoders.
             // May want to use RUN_USING_ENCODERS if encoders are installed.
 
-            backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            backLeft.setMode(RUN_WITHOUT_ENCODER);
+            frontLeft.setMode(RUN_WITHOUT_ENCODER);
+            frontRight.setMode(RUN_WITHOUT_ENCODER);
+            backRight.setMode(RUN_WITHOUT_ENCODER);
 
         }
         else {
@@ -212,10 +227,10 @@ public class CompetitionHardware
             backRight.setMode(STOP_AND_RESET_ENCODER);
 
             //RUN USING ENCODER
-            backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            backLeft.setMode(RUN_USING_ENCODER);
+            frontLeft.setMode(RUN_USING_ENCODER);
+            frontRight.setMode(RUN_USING_ENCODER);
+            backRight.setMode(RUN_USING_ENCODER);
 
             backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -288,28 +303,36 @@ public class CompetitionHardware
 
         setDirection(direction);
 
-        backLeft.setTargetPosition(newBleftTarget);
+/*        backLeft.setTargetPosition(newBleftTarget);
         backRight.setTargetPosition(newBrightTarget);
         frontLeft.setTargetPosition(newFleftTarget);
-        frontRight.setTargetPosition(newFrightTarget);
+        frontRight.setTargetPosition(newFrightTarget);*/
 
         // Turn On RUN_TO_POSITION
-        backLeft.setMode(RUN_TO_POSITION);
+/*        backLeft.setMode(RUN_TO_POSITION);
         backRight.setMode(RUN_TO_POSITION);
         frontLeft.setMode(RUN_TO_POSITION);
-        frontRight.setMode(RUN_TO_POSITION);
+        frontRight.setMode(RUN_TO_POSITION);*/
 
         if (!activateSpeedProfile) {
             //Setting the power
             setPower4WDrive(Math.abs(speed));
 
-            while (backLeft.isBusy() || backRight.isBusy() || frontLeft.isBusy() || frontRight.isBusy()) {
+            while (
+                newBleftTarget > backLeft.getCurrentPosition() &&
+                newBrightTarget > backRight.getCurrentPosition() &&
+                newFleftTarget > frontLeft.getCurrentPosition() &&
+                newFrightTarget > frontRight.getCurrentPosition()
+            )
+            {
                 // just waiting when motors are busy
-                Thread.yield();
+                 // Thread.yield();
             }
         } else {
             set4WDriveWithSpeedProfile(direction, Math.abs(speed), newBleftTarget, backLeft, opMode);
         }
+
+
 
         // Stop all motion - TODO test if it actually works - encoder run to position might actually stop motors
         if(!linkMoves) {
@@ -886,7 +909,7 @@ public class CompetitionHardware
     public int linearMoveOne (DcMotor testMotor, int direction,double speed, double distance) {
 
         int testTarget;
-        testMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        testMotor.setMode(RUN_WITHOUT_ENCODER);
 
         // Determine new target position, and pass to motor controller
         testTarget = testMotor.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
@@ -979,4 +1002,58 @@ public class CompetitionHardware
         }
     }
 
+    // PID coefficients section
+
+    protected void changePIDCoefficients(RunMode runMode, double NEW_P, double NEW_I, double NEW_D) {
+        changePIDCoefficients(frontLeft, runMode, NEW_P, NEW_I, NEW_D);
+        changePIDCoefficients(frontRight, runMode, NEW_P, NEW_I, NEW_D);
+        changePIDCoefficients(backLeft, runMode, NEW_P, NEW_I, NEW_D);
+        changePIDCoefficients(backRight, runMode, NEW_P, NEW_I, NEW_D);
+    }
+
+    protected void changePIDCoefficients(DcMotor dcMotor, RunMode runMode, double NEW_P, double NEW_I, double NEW_D) {
+        // get a reference to the motor controller and cast it as an extended functionality controller.
+        // we assume it's a REV Robotics Expansion Hub (which supports the extended controller functions).
+        DcMotorControllerEx motorControllerEx = (DcMotorControllerEx)dcMotor.getController();
+
+        // get the port number of our configured motor.
+        int motorIndex = ((DcMotorEx)dcMotor).getPortNumber();
+
+        // get the PID coefficients for the RUN_USING_ENCODER  modes.
+        //PIDCoefficients pidOrig = motorControllerEx.getPIDCoefficients(motorIndex, runMode);
+
+        // change coefficients.
+        PIDCoefficients pidNew = new PIDCoefficients(NEW_P, NEW_I, NEW_D);
+        motorControllerEx.setPIDCoefficients(motorIndex, runMode, pidNew);
+    }
+
+    // End PID coefficients section
+
+    // helper class to track Motor postions
+    private class PositionTracker {
+        int backLeftStart, backRightStart, frontLeftStart, frontRightStart;
+
+        public PositionTracker() {
+            reset();
+        }
+
+        public void reset() {
+            setMotorsMode(RUN_WITHOUT_ENCODER);
+
+            backLeftStart = backLeft.getCurrentPosition();
+            backRightStart = backRight.getCurrentPosition();
+            frontLeftStart = frontLeft.getCurrentPosition();
+            frontRightStart = frontRight.getCurrentPosition();
+        }
+
+        public int getMaxGain() {
+            return Math.max(Math.max(backLeft.getCurrentPosition() - backLeftStart, backRight.getCurrentPosition() - backRightStart),
+                    Math.max(frontLeft.getCurrentPosition() - frontLeftStart, frontRight.getCurrentPosition() - frontRightStart));
+        }
+
+        public int getMinGain() {
+            return Math.min(Math.min(backLeft.getCurrentPosition() - backLeftStart, backRight.getCurrentPosition() - backRightStart),
+                    Math.min(frontLeft.getCurrentPosition() - frontLeftStart, frontRight.getCurrentPosition() - frontRightStart));
+        }
+    }
 }

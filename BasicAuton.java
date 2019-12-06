@@ -261,13 +261,13 @@ public class BasicAuton extends LinearOpMode {
 
     public void placeSkyStoneOnFoundation() {
 
-        choiceOfArm.goDown(0.9);
+        choiceOfArm.goDown(0.75);
         //sleep(3000);
 
-        choiceOfArm.releaseStone(0.9);
+        choiceOfArm.releaseStone(1);
         sleep(500);
 
-        choiceOfArm.liftUp(0.9);
+        choiceOfArm.liftUp(1);
         sleep(1000);
 
     }
@@ -429,7 +429,7 @@ public class BasicAuton extends LinearOpMode {
          * Here we chose the back (HiRes) camera (for greater range), but
          * for a competition robot, the front camera might be more convenient.
          */
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
         /**
          * Instantiate the Vuforia engine
@@ -529,5 +529,3 @@ public class BasicAuton extends LinearOpMode {
         choiceOfArm.liftUp(1.0);
     }
 }
-
-

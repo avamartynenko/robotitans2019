@@ -31,27 +31,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.vuforia.CameraDevice;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
-import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
-import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
+import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.FORWARD;
+import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.REVERSE;
+import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT;
 
 /**
  * This 2019-2020 OpMode illustrates the basics of using the Vuforia localizer to determine
@@ -85,7 +71,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 // Use fast skystone detection method by comparing brightness of the stone instead of vuforia target recognition
 @Autonomous(name="SkyStone - Fast", group ="Competition")
-//@Disabled
+@Disabled
 public class SkyStoneFast extends BasicAuton {
 
     private int targetPostion = 0;
@@ -96,9 +82,13 @@ public class SkyStoneFast extends BasicAuton {
     private int sleepTime = 100;
     private int detectionWaitTime = 2000;
     private int latchTime = 1250;
+    private double ROBOT_WIDTH = 17.5;
 
     @Override public void runOpMode() {
+        super.setInitVuforia(true);
         super.initialize();
+
+        double globalHeading = robot.getAbsoluteHeading();
 
         waitForStart();
 
@@ -134,25 +124,29 @@ public class SkyStoneFast extends BasicAuton {
 
         telemetry.addData("Offset ", "%.1f", SkyStoneOffset);
 
-        if(SkyStoneOffset > 0)
-            robot.linearMove(CompetitionHardware.Direction.REVERSE, slowMoSpeed, SkyStoneOffset);
-        else
-            robot.linearMove(CompetitionHardware.Direction.FORWARD, slowMoSpeed, -SkyStoneOffset);
+        robot.activateSpeedProfile = true;
 
-        robot.linearMove(CompetitionHardware.Direction.RIGHT, MAX_SPEED*.8,25.5);
+        if(SkyStoneOffset > 0)
+            robot.linearMove(REVERSE, MAX_SPEED, SkyStoneOffset, this);
+        else
+            robot.linearMove(FORWARD, MAX_SPEED, -SkyStoneOffset, this);
+
+        robot.linearMove(RIGHT, MAX_SPEED,25.5, this);
 
         pickupStone();
-        deliverStone();
-        //goForSecondStone();
-        parkUnderTheBridge();
+        if(false) {
+            deliverStone();
+            //goForSecondStone();
+            parkUnderTheBridge();
+        }
     }
 
     public void deliverStone(){
         robot.linearMove(CompetitionHardware.Direction.LEFT, slowMoSpeed, safeDistanceOffset);
         sleep(750);
         double initialOffset = 8 * (2 - targetPostion); // stone dimentions are 8x4x5
-        robot.linearMove(CompetitionHardware.Direction.REVERSE, MAX_SPEED, dropZoneOffset - 16 + initialOffset);
-        robot.linearMove(CompetitionHardware.Direction.RIGHT, slowMoSpeed, 4);
+        robot.linearMove(REVERSE, MAX_SPEED, dropZoneOffset - 16 + initialOffset);
+        robot.linearMove(RIGHT, slowMoSpeed, 4);
 
         placeSkyStoneOnFoundation();
 
@@ -165,7 +159,7 @@ public class SkyStoneFast extends BasicAuton {
 
         reOrient();  // will change orientation based on alliance color
 
-        linearMoveWrapper(CompetitionHardware.Direction.REVERSE, slowMoSpeed, 10);
+        linearMoveWrapper(REVERSE, slowMoSpeed, 10);
 
         // Grab and pull the platform
         robot.hookLatch.latch();
@@ -173,18 +167,18 @@ public class SkyStoneFast extends BasicAuton {
 
         // pull platform back
         //linearMoveWrapper(robot.FORWARD, 32, false);
-        linearMoveWrapper(CompetitionHardware.Direction.FORWARD, MAX_SPEED, 36);
+        linearMoveWrapper(FORWARD, MAX_SPEED, 36);
 
         robot.hookLatch.release();
 
         // push platform to the corner
-        linearMoveWrapper(CompetitionHardware.Direction.RIGHT, MAX_SPEED,37);
+        linearMoveWrapper(RIGHT, MAX_SPEED,37);
 
-        linearMoveWrapper(CompetitionHardware.Direction.REVERSE, MAX_SPEED,23);
+        linearMoveWrapper(REVERSE, MAX_SPEED,23);
 
         // retreat and park under the bridge
 
-        linearMoveWrapper(CompetitionHardware.Direction.RIGHT, MAX_SPEED,22);
+        linearMoveWrapper(RIGHT, MAX_SPEED,22);
     }
 
     public void goForSecondStone(){

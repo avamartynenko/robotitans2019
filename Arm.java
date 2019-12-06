@@ -4,14 +4,12 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import static java.lang.Thread.sleep;
-
 public class Arm {
 
 
 
-    CRServo dropServo;
-    CRServo collectServo;
+    public CRServo dropServo;
+    public CRServo collectServo;
     public int name;  // Front or Back
     HardwareMap hwMap =  null;
     public final int DOWN = 1;
