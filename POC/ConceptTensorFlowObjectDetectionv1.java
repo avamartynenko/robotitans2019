@@ -57,7 +57,7 @@ import java.util.List;
  */
 @Autonomous(name="POC: TensorFlow Object Detection", group="POC")
 //@TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
-@Disabled
+//@Disabled
 public class ConceptTensorFlowObjectDetectionv1 extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";

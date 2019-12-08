@@ -460,6 +460,8 @@ public class VuforiaTestSkyStoneBlueBase extends BasicAuton {
         // retreat and park under the bridge
 
         linearMoveWrapper(RIGHT, MAX_SPEED,17);
+
+        // just making this comment for commit
     }
 
     public void goForSecondStone(){

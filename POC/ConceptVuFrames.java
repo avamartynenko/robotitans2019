@@ -35,6 +35,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -80,7 +82,7 @@ import static android.content.Context.SENSOR_SERVICE;
 
 @Autonomous(name = "POC: VuMark Frames", group = "POC")
 //@TeleOp(name="Concept: VuMark Id", group ="Concept")
-//@Disabled
+@Disabled
 public class ConceptVuFrames extends BasicAuton {
 
     @Override

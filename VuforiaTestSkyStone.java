@@ -52,6 +52,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.FORWARD;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.GYRO_LEFT;
+import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.GYRO_RIGHT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.LEFT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.REVERSE;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT;
@@ -147,7 +148,7 @@ public class VuforiaTestSkyStone extends BasicAuton {
     private int targetPostion = 0;
 
     private double safeDistanceOffset = 3;
-    private double dropZoneOffset = 78;
+    private double dropZoneOffset = 78;  //78
     private double slowMoSpeed = .4;
     private int sleepTime = 100;
     private int detectionWaitTime = 2000;
@@ -344,7 +345,7 @@ public class VuforiaTestSkyStone extends BasicAuton {
 
         targetsSkyStone.activate();
 
-        robot.linearMove(FORWARD, slowMoSpeed,5);
+        robot.linearMove(FORWARD, slowMoSpeed,5); //orig 5 7th Dec
         robot.linearMove(RIGHT, slowMoSpeed,18.5);
         sleep(detectionWaitTime);
 
@@ -426,10 +427,11 @@ public class VuforiaTestSkyStone extends BasicAuton {
             robot.activateSpeedProfile = true;
             //robot.correctHeading(0, this);
         }
-//        robot.correctHeading(0, this);
+
+        //robot.correctHeading(0, this);
         robot.linearMove(REVERSE, MAX_SPEED, dropZoneOffset - 16 + initialOffset, this);
         robot.activateSpeedProfile = false;
-        robot.linearMove(RIGHT, slowMoSpeed, 6, this);
+        robot.linearMove(RIGHT, slowMoSpeed, 8, this);  // 6
 
         placeSkyStoneOnFoundation();
 
@@ -454,28 +456,37 @@ public class VuforiaTestSkyStone extends BasicAuton {
 
         reOrient();  // will change orientation based on alliance color
 
-        linearMoveWrapper(REVERSE, slowMoSpeed, 8);
+        linearMoveWrapper(REVERSE, slowMoSpeed, 6);  // orig 8  7th Dec
 
         // Grab and pull the platform
         robot.hookLatch.latch();
         sleep(latchTime);
         telemetry.log().add("Performing gyro move at 10");
-        robot.gyroMove2(GYRO_LEFT, 8, telemetry);
+        robot.gyroMove2(GYRO_LEFT, 5, telemetry); //orig 8 7th Dec
 
         // pull platform back
         //linearMoveWrapper(robot.FORWARD, 32, false);
-        linearMoveWrapper(FORWARD, MAX_SPEED, 36);
+        linearMoveWrapper(FORWARD, MAX_SPEED, 34);  // TO BE CHECKED orig 36  7th Dec
+        robot.gyroMove2(GYRO_RIGHT, 10, telemetry); //newly added
 
         robot.hookLatch.release();
 
+        int lastMoveDistance = 42;
+        // 37
+
+        //if(targetPostion==2) lastMoveDistance = lastMoveDistance+ 5;
         // push platform to the corner
-        linearMoveWrapper(RIGHT, MAX_SPEED,37);
+        linearMoveWrapper(RIGHT, MAX_SPEED,lastMoveDistance);
 
         linearMoveWrapper(REVERSE, MAX_SPEED,18);
 
         // retreat and park under the bridge
 
-        linearMoveWrapper(RIGHT, MAX_SPEED,22);
+        lastMoveDistance = 17; //22
+        //if(targetPostion==2) lastMoveDistance = lastMoveDistance - 5;
+
+
+        linearMoveWrapper(RIGHT, MAX_SPEED,lastMoveDistance);
     }
 
     public void goForSecondStone(){
