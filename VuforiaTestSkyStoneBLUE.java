@@ -51,8 +51,6 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.FORWARD;
-import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.GYRO_LEFT;
-import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.GYRO_RIGHT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.LEFT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.REVERSE;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT;
@@ -88,9 +86,9 @@ import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT
  */
 
 
-@Autonomous(name="RED_VuforiaTestSkyStone", group ="Concept")
+@Autonomous(name="BLUE_VuforiaTestSkyStone", group ="Competition")
 //@Disabled
-public class VuforiaTestSkyStone extends BasicAuton {
+public class VuforiaTestSkyStoneBLUE extends BasicAuton {
 
 
 
@@ -148,7 +146,7 @@ public class VuforiaTestSkyStone extends BasicAuton {
     private int targetPostion = 0;
 
     private double safeDistanceOffset = 3;
-    private double dropZoneOffset = 78;  //78
+    private double dropZoneOffset = 90;
     private double slowMoSpeed = .4;
     private int sleepTime = 100;
     private int detectionWaitTime = 2000;
@@ -157,7 +155,10 @@ public class VuforiaTestSkyStone extends BasicAuton {
 
     @Override public void runOpMode() {
 
+        //super.setAllianceColor(GAME_ALLIANCE_BLUE);
+
         super.initialize();
+        super.setChoiceOfArm(robot.backArm);
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
@@ -328,14 +329,14 @@ public class VuforiaTestSkyStone extends BasicAuton {
             ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
         }
 
+        telemetry.addLine("Vuforia is ready");
+        telemetry.update();
+
         // WARNING:
         // In this sample, we do not wait for PLAY to be pressed.  Target Tracking is started immediately when INIT is pressed.
         // This sequence is used to enable the new remote DS Camera Preview feature to be used with this sample.
         // CONSEQUENTLY do not put any driving commands in this loop.
         // To restore the normal opmode structure, just un-comment the following line:
-
-        telemetry.addLine("Vuforia is ready");
-        telemetry.update();
 
         waitForStart();
 
@@ -345,8 +346,8 @@ public class VuforiaTestSkyStone extends BasicAuton {
 
         targetsSkyStone.activate();
 
-        robot.linearMove(FORWARD, slowMoSpeed,5); //orig 5 7th Dec
-        robot.linearMove(RIGHT, slowMoSpeed,18.5);
+        robot.linearMove(REVERSE, slowMoSpeed,5);
+        robot.linearMove(LEFT, slowMoSpeed,18.5);
         sleep(detectionWaitTime);
 
         if (opModeIsActive()) {
@@ -385,7 +386,7 @@ public class VuforiaTestSkyStone extends BasicAuton {
                 } else {
                     targetPostion++;
                     telemetry.addData("Visible Target", "none");
-                    robot.linearMove(REVERSE, slowMoSpeed, 6);
+                    robot.linearMove(FORWARD, slowMoSpeed, 6);
                     sleep(detectionWaitTime);
                 }
 
@@ -408,8 +409,8 @@ public class VuforiaTestSkyStone extends BasicAuton {
 
     public void repositionAndPickupSkystone(){
 
-        robot.linearMove(REVERSE, slowMoSpeed, 5);
-        robot.linearMove(RIGHT, slowMoSpeed, 6);
+        robot.linearMove(FORWARD, slowMoSpeed, 5);
+        robot.linearMove(LEFT, slowMoSpeed, 8);
         //pickUpSkyStone();
         choiceOfArm.latchStone(1.0);
         choiceOfArm.goDown(1.0);
@@ -427,66 +428,43 @@ public class VuforiaTestSkyStone extends BasicAuton {
             robot.activateSpeedProfile = true;
             //robot.correctHeading(0, this);
         }
-
-        //robot.correctHeading(0, this);
-        robot.linearMove(REVERSE, MAX_SPEED, dropZoneOffset - 16 + initialOffset, this);
+        robot.linearMove(FORWARD, MAX_SPEED, dropZoneOffset - 20 + initialOffset, this);
         robot.activateSpeedProfile = false;
-        robot.linearMove(RIGHT, slowMoSpeed, 8, this);  // 6
+        robot.linearMove(LEFT, slowMoSpeed, 15, this);
 
         placeSkyStoneOnFoundation();
 
         //dropCube();  // basic auton will get the proper arm by its self
 
         // pullback and rotate
-        linearMoveWrapper(LEFT, MAX_SPEED*0.6, 3);
+        linearMoveWrapper(RIGHT, MAX_SPEED*0.6, 3);
         //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
+        robot.gyroMove(CompetitionHardware.Direction.GYRO_RIGHT, MAX_SPEED*0.8,65);
 
-        if(false /*allianceColor == GAME_ALLIANCE_RED*/) {
-            robot.activateSpeedProfile = true;
-            robot.gyroMove90(GYRO_LEFT, telemetry);
-            robot.activateSpeedProfile = false;
-        }
-        else {
-            telemetry.log().add("Angle before paltrorm rotate: " + robot.getActualHeading());
-            robot.gyroMove(GYRO_LEFT, MAX_SPEED * 0.8, 70);
-            telemetry.log().add("Angle after platform rotate: " + robot.getActualHeading());
-            telemetry.update();
-        }
+        //reOrient();  // will change orientation based on alliance color
 
-
-        reOrient();  // will change orientation based on alliance color
-
-        linearMoveWrapper(REVERSE, slowMoSpeed, 6);  // orig 8  7th Dec
+        linearMoveWrapper(FORWARD, slowMoSpeed, 10);
 
         // Grab and pull the platform
         robot.hookLatch.latch();
         sleep(latchTime);
-        telemetry.log().add("Performing gyro move at 10");
-        robot.gyroMove2(GYRO_LEFT, 5, telemetry); //orig 8 7th Dec
 
         // pull platform back
         //linearMoveWrapper(robot.FORWARD, 32, false);
-        linearMoveWrapper(FORWARD, MAX_SPEED, 34);  // TO BE CHECKED orig 36  7th Dec
-        robot.gyroMove2(GYRO_RIGHT, 10, telemetry); //newly added
+        linearMoveWrapper(REVERSE, MAX_SPEED, 36);
 
         robot.hookLatch.release();
 
-        int lastMoveDistance = 42;
-        // 37
-
-        //if(targetPostion==2) lastMoveDistance = lastMoveDistance+ 5;
         // push platform to the corner
-        linearMoveWrapper(RIGHT, MAX_SPEED,lastMoveDistance);
+        linearMoveWrapper(LEFT, MAX_SPEED,37);
 
-        linearMoveWrapper(REVERSE, MAX_SPEED,18);
+        linearMoveWrapper(FORWARD, MAX_SPEED,22);
 
         // retreat and park under the bridge
 
-        lastMoveDistance = 17; //22
-        //if(targetPostion==2) lastMoveDistance = lastMoveDistance - 5;
+        linearMoveWrapper(LEFT, MAX_SPEED,17);
 
-
-        linearMoveWrapper(RIGHT, MAX_SPEED,lastMoveDistance);
+        // just making this comment for commit
     }
 
     public void goForSecondStone(){
