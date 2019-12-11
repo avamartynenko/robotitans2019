@@ -75,9 +75,9 @@ import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT
  */
 
 // Use fast skystone detection method by comparing brightness of the stone instead of vuforia target recognition
-@Autonomous(name="SkyStone - Fast", group ="Competition")
+@Autonomous(name="2 Skystones - Red", group ="Competition")
 //@Disabled
-public class SkyStoneFast extends BasicAutonEx {
+public class TwoStoneRed extends BasicAutonEx {
 
     private int targetPostion = 0;
 
@@ -87,6 +87,7 @@ public class SkyStoneFast extends BasicAutonEx {
     private int sleepTime = 100;
     private int detectionWaitTime = 2000;
     private int latchTime = 1250;
+
 
     @Override public void runOpMode() {
         super.initialize();
@@ -116,6 +117,7 @@ public class SkyStoneFast extends BasicAutonEx {
 
         //waitForStart();
         robot.opStartHeading = robot.getActualHeading();
+        robot.setReferenceAngles(true);
 
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
@@ -172,7 +174,7 @@ public class SkyStoneFast extends BasicAutonEx {
         telemetry.log().add("1st stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();
 
-        robot.setHeading(0, this);
+        //robot.setHeading(0, this);
 
         // drop first skystone
         distanceFromFWall = robot.sensorRangeF.getDistance(INCH) - 15;
@@ -224,7 +226,7 @@ public class SkyStoneFast extends BasicAutonEx {
         telemetry.log().add("2nd stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();
 
-        robot.setHeading(0, this);
+        //robot.setHeading(0, this);
 
         // drop second skystone
         distanceFromFWall = robot.sensorRangeF.getDistance(INCH);
@@ -241,6 +243,9 @@ public class SkyStoneFast extends BasicAutonEx {
         telemetry.update();
 
         robot.gyroMove90(GYRO_LEFT, telemetry);
+
+        // TODO: update gyro move to update reference angles after rotation
+        robot.setReferenceAngles(true);
 
         telemetry.log().add("Completed 90 turn: " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();

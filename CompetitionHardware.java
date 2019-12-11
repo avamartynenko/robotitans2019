@@ -142,11 +142,11 @@ public class CompetitionHardware
     public final double STOP_THRESHOLD = .25;   // min XY accell below which we consider that robot is stationary
 
     // variables for using gyro
-    private boolean gyroInitialized = false;
+    protected boolean gyroInitialized = false;
     Orientation angles;
     public BNO055IMU        imu;
-    private Orientation     lastAngles = new Orientation();
-    private double          globalAngle, rotation;
+    protected Orientation   lastAngles = new Orientation();
+    protected double        globalAngle, rotation;
     private PIDController   pidRotate, pidDrive;
 
     /* local OpMode members. */
@@ -287,8 +287,11 @@ public class CompetitionHardware
 
         // encoder position does not get reset between program starts
         // motors can start in random positions if robot was not restarted after completion of previous program
-        if(activateSpeedProfile)
+        if(activateSpeedProfile) {
             setEncoder(true);
+            //setMotorsMode(RUN_TO_POSITION);
+            setZeroPowerMode(BRAKE);
+        }
 
         // Determine new target position, and pass to motor controller
         newBleftTarget = backLeft.getCurrentPosition() + (int)(distance * COUNTS_PER_INCH);
@@ -298,7 +301,7 @@ public class CompetitionHardware
 
         if(opMode != null) {
             opMode.telemetry.log().add("Linear move direction: " + direction2string(direction) + ". Distance: " + distance + " inches");
-            opMode.telemetry.log().add("Speed profile " + (activateSpeedProfile ? "ON" : "OFF"));
+            //opMode.telemetry.log().add("Speed profile " + (activateSpeedProfile ? "ON" : "OFF"));
         }
 
         setDirection(direction);
@@ -388,18 +391,18 @@ public class CompetitionHardware
                 case LEFT:
                 case RIGHT:
                     minBreakSpeed = .25;
-                    breakDistance = 200;
+                    breakDistance = 250;
                     break;
             }
 
             // set postion increment for straif
             switch (direction) {
                 case LEFT:
-                    posIncrement = (backLeft.getTargetPosition() - backLeft.getCurrentPosition())*.15;
+                    posIncrement = (backLeft.getTargetPosition() - backLeft.getCurrentPosition())*.40;
                     correctedTarget += posIncrement;
                     break;
                 case RIGHT:
-                    posIncrement = (backLeft.getTargetPosition() - backLeft.getCurrentPosition())*.15;
+                    posIncrement = (backLeft.getTargetPosition() - backLeft.getCurrentPosition())*.40;
                     correctedTarget += posIncrement;
                     break;
                 default:
@@ -422,8 +425,8 @@ public class CompetitionHardware
 
             double correction = 0;
 
-            if(opMode != null) {
-                opMode.telemetry.log().add("Postions bl " + backLeft.getCurrentPosition() + " br " + backRight.getCurrentPosition() + " fl " + frontLeft.getCurrentPosition() + " fr " + frontRight.getCurrentPosition());
+            if(opMode != null && false) {
+                opMode.telemetry.log().add("Current Positions bl " + backLeft.getCurrentPosition() + " br " + backRight.getCurrentPosition() + " fl " + frontLeft.getCurrentPosition() + " fr " + frontRight.getCurrentPosition());
                 opMode.telemetry.log().add("Heading " + getActualHeading() + ". Angle: " + getAngle());
                 opMode.telemetry.log().add("Target original/corrected " + target + "/" + correctedTarget);
             }
@@ -449,7 +452,7 @@ public class CompetitionHardware
                         Range.clip(currentSpeed + correction, -1, 1));
             }
 
-            if(opMode != null) {
+            if(opMode != null && false) {
                 opMode.telemetry.log().add("Final correction " + correction);
                 opMode.telemetry.log().add("Pre break heading " + getActualHeading());
                 opMode.telemetry.log().add("Prebreak position bl " + backLeft.getCurrentPosition() + " br " + backRight.getCurrentPosition() + " fl " + frontLeft.getCurrentPosition() + " fr " + frontRight.getCurrentPosition());
@@ -484,8 +487,8 @@ public class CompetitionHardware
 
             double correctionAngle = calcTurnAngleD(initialHeading, getAbsoluteHeading());
 
-            if(opMode != null) {
-                opMode.telemetry.log().add("Postions bl " + backLeft.getCurrentPosition() + " br " + backRight.getCurrentPosition() + " fl " + frontLeft.getCurrentPosition() + " fr " + frontRight.getCurrentPosition());
+            if(opMode != null && false) {
+                opMode.telemetry.log().add("Positions bl " + backLeft.getCurrentPosition() + " br " + backRight.getCurrentPosition() + " fl " + frontLeft.getCurrentPosition() + " fr " + frontRight.getCurrentPosition());
                 opMode.telemetry.log().add("Final heading/correction angle " + getActualHeading() + "/" + correctionAngle);
             }
 
@@ -495,7 +498,6 @@ public class CompetitionHardware
         ElapsedTime et = new ElapsedTime();
         setPower4WDrive(0);
         setEncoder(true);
-        opMode.telemetry.log().add("Motors reset time: " + et.milliseconds());
     }
 
     protected boolean oneMotorAtTarget() {
@@ -505,8 +507,18 @@ public class CompetitionHardware
                 frontRight.getCurrentPosition() >= frontRight.getTargetPosition();
     }
 
+
+    protected boolean allMotorsAtTarget() {
+        return  backLeft.getCurrentPosition() >= backLeft.getTargetPosition() &&
+                backRight.getCurrentPosition() >= backRight.getTargetPosition() &&
+                frontLeft.getCurrentPosition() >= frontLeft.getTargetPosition() &&
+                frontRight.getCurrentPosition() >= frontRight.getTargetPosition();
+    }
+
     public void correctHeading(double initialHeading, LinearOpMode opMode) {
-        double correctionAngle = calcTurnAngleD(initialHeading, getAbsoluteHeading());
+        double correctionAngle = calcTurnAngleD(initialHeading, getActualHeading());
+        opMode.telemetry.log().add("correctHeading correction Angle: " + correctionAngle);
+        opMode.telemetry.update();
         if(correctionAngle != 0) {
             Direction correctionAngleDirection = (correctionAngle < 0) ? Direction.GYRO_LEFT : Direction.GYRO_RIGHT;
             gyroMoveByOffset(correctionAngleDirection, 1, Math.abs(correctionAngle), opMode);
@@ -525,7 +537,7 @@ public class CompetitionHardware
         setEncoder(true);
 
         int positionIncrement = (int) (degrees * 1000 / 60); // 60 degress ~ 1000 steps
-        opMode.telemetry.log().add("Gyro/offset Initial heading/tics " + getActualHeading() + "/" + positionIncrement);
+        //opMode.telemetry.log().add("Actual heading/tics/direction " + getActualHeading() + "/" + positionIncrement + "/" + direction);
 
         frontLeft.setTargetPosition(positionIncrement);
         frontRight.setTargetPosition(positionIncrement);
@@ -551,7 +563,7 @@ public class CompetitionHardware
         setPower4WDrive(0);
         waitToStop();
 
-        opMode.telemetry.log().add("Final heading: " + getActualHeading());
+        //opMode.telemetry.log().add("Final heading: " + getActualHeading());
     }
 
     // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
@@ -768,12 +780,13 @@ public class CompetitionHardware
     }
 
     /**
-     * Calculate angle values between two directions in degrees
+     * Calculate _absolute_ angle values between two directions in degrees
      * @param startAngle the initial heading
      * @param currentAngle current heading
      * @return different between initial and current heading
      */
-    private double calcTurnAngleD(double startAngle, double currentAngle) {
+    protected double calcTurnAngleD(double startAngle, double currentAngle) {
+
         double turnAngle = Math.abs(currentAngle - startAngle);
         turnAngle = (turnAngle > 360) ? turnAngle - 360 : turnAngle;
         turnAngle = (turnAngle > 180) ? 360 - turnAngle : turnAngle;
@@ -811,7 +824,7 @@ public class CompetitionHardware
     /**
      * Resets the cumulative angle tracking to zero.
      */
-    private void resetAngle()
+    protected void resetAngle()
     {
         lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
@@ -951,7 +964,7 @@ public class CompetitionHardware
         backLeft.setMode(mode);
     }
 
-    private String direction2string(Direction direction) {
+    protected String direction2string(Direction direction) {
         String result = "UNKNOWN";
 
         switch (direction)
@@ -982,7 +995,7 @@ public class CompetitionHardware
         return result;
     }
 
-    private String getREVName() {
+    protected String getREVName() {
         String sResult = "";
 
         for(Object o: hwMap) {
@@ -996,7 +1009,7 @@ public class CompetitionHardware
         return sResult;
     }
 
-    private void waitToStop() {
+    protected void waitToStop() {
         while (Math.sqrt(Math.pow(imu.getLinearAcceleration().xAccel, 2) + Math.pow(imu.getLinearAcceleration().yAccel,2)) > STOP_THRESHOLD) {
             Thread.yield();
         }

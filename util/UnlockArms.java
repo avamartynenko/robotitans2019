@@ -38,6 +38,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -66,6 +67,7 @@ import static android.content.Context.SENSOR_SERVICE;
 
 // Resets current given to arms to move them freely
 @Autonomous(name="Util: Unlock Arms", group="Util")
+@Disabled
 public class UnlockArms extends LinearOpMode {
     /* SkyStone tracking variables */
     public static final String TAG = "Vuforia VuMark Sample";
@@ -540,7 +542,7 @@ public class UnlockArms extends LinearOpMode {
 
 //                        telemetry.addData("Col RGB & RG Lum " + iBar, "%d %d %d=%d", (int) r, (int) g, (int) b, iLum[iBar]);
                     }
-                    telemetry.addData("Calc Time: ", "%d milliseconds", (int) (opmodeRunTime.milliseconds() - dstart));
+                    telemetry.addData("Calc Time", "%d milliseconds", (int) (opmodeRunTime.milliseconds() - dstart));
                     String sConfig = "000";
                     if (iLum[0] <= iLum[1] && iLum[0] <= iLum[2]) {
                         sConfig = "X00";

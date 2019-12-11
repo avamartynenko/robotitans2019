@@ -27,16 +27,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.POC;
+package org.firstinspires.ftc.teamcode.util;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import android.app.Activity;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -44,12 +43,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-//import org.firstinspires.ftc.teamcode.util.SensorManagerHelper;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.CompetitionHardwareEx;
+
+import java.text.DecimalFormat;
 
 import static android.content.Context.SENSOR_SERVICE;
+import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
+
+//import org.firstinspires.ftc.teamcode.util.SensorManagerHelper;
 
 /**
- * {@link ConceptTelemetry} illustrates various ways in which telemetry can be
+ * {@link DistanceSensors} illustrates various ways in which telemetry can be
  * transmitted from the robot controller to the driver station. The sample illustrates
  * numeric and text data, formatted output, and optimized evaluation of expensive-to-acquire
  * information. The telemetry {@link Telemetry#log() log} is illustrated by scrolling a poem
@@ -57,9 +62,9 @@ import static android.content.Context.SENSOR_SERVICE;
  *
  * @see Telemetry
  */
-@TeleOp(name="POC: Telemetry", group = "POC")
-@Disabled
-public class ConceptTelemetry extends LinearOpMode  {
+@TeleOp(name="Diag: Distance Sensors", group = "Util")
+//@Disabled
+public class DistanceSensors extends LinearOpMode  {
     /** keeps track of the line of the poem which is to be emitted next */
     int poemLine = 0;
 
@@ -79,6 +84,8 @@ public class ConceptTelemetry extends LinearOpMode  {
     public float azimuth = 0;
     public float pitch=0;
     public float roll=0;
+
+    CompetitionHardwareEx robot = new CompetitionHardwareEx();
 
 
     static final String[] poem = new String[] {
@@ -111,6 +118,8 @@ public class ConceptTelemetry extends LinearOpMode  {
     private static final int REQUEST_CAPTURE_IMAGE = 100;
 
     @Override public void runOpMode() {
+
+        robot.init(hardwareMap, false, false, true);
 
 
         /* we keep track of how long it's been since the OpMode was started, just
@@ -162,6 +171,8 @@ public class ConceptTelemetry extends LinearOpMode  {
         opmodeRunTime.reset();
         int loopCount = 1;
 
+        DecimalFormat df = new DecimalFormat("#.#");
+
 
 
         // Go go gadget robot!
@@ -169,25 +180,24 @@ public class ConceptTelemetry extends LinearOpMode  {
 
 //            smh = new SensorManagerHelper(hardwareMap);
             //telemetry.addData("Azimuth, pitch, roll: ", "%.3f %.3f %.3f", azimuth, pitch, roll);
-            telemetry.addData("Pitch: ", "%.3f", pitch);
+            //telemetry.addData("Pitch: ", "%.3f", pitch);
             //telemetry.addData("Angles: ", "%.3f %.3 %.3f", .1, .2, .3);
 
             // Emit poetry if it's been a while
-            if (poemElapsed.seconds() > sPoemInterval) {
+   /*         if (poemElapsed.seconds() > sPoemInterval) {
                 emitPoemLine();
-            }
+            }*/
 
             // As an illustration, show some loop timing information
             telemetry.addData("loop count", loopCount);
             telemetry.addData("ms/loop", "%.3f ms", opmodeRunTime.milliseconds() / loopCount);
 
             // Show joystick information as some other illustrative data
-            telemetry.addLine("left joystick | ")
-                    .addData("x", gamepad1.left_stick_x)
-                    .addData("y", gamepad1.left_stick_y);
-            telemetry.addLine("right joystick | ")
-                    .addData("x", gamepad1.right_stick_x)
-                    .addData("y", gamepad1.right_stick_y);
+            telemetry.addLine("Distance Sensors")
+                    .addData("Front", df.format(robot.sensorTimeOfFlightF.getDistance(INCH)))
+                    .addData("Back", df.format(robot.sensorTimeOfFlightB.getDistance(INCH)))
+                    .addData("Left", df.format(robot.sensorTimeOfFlightL.getDistance(INCH)))
+                    .addData("Right", df.format(robot.sensorTimeOfFlightR.getDistance(INCH)));
 
             /**
              * Transmit the telemetry to the driver station, subject to throttling.
