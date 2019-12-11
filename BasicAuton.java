@@ -55,6 +55,7 @@ import java.util.Locale;
 import java.util.concurrent.BlockingQueue;
 
 import static android.content.Context.SENSOR_SERVICE;
+import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
 
 /**
  *
@@ -77,7 +78,7 @@ public class BasicAuton extends LinearOpMode {
     static final double WALL_RECOIL = .5; // how far we pull back from the wall
     static final double START_SPEED = .5; // highest possible speed with no slippage
     static final double MAX_SPEED = 1.0;
-    private static final int STONE_HEIGHT = 100;
+    protected static final int STONE_HEIGHT = 100; // pixels height of the are with sckystone
     // azimuth, pitch and roll
     public float azimuth = 0;
     public float pitch = 0;
@@ -94,6 +95,7 @@ public class BasicAuton extends LinearOpMode {
     }
 
     public boolean initVuforia = false;
+    private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = FRONT;
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
      * localization engine.
@@ -391,6 +393,9 @@ public class BasicAuton extends LinearOpMode {
         float alpha = cc.getFieldOfViewRads().getData()[0];
         float H = bmp.getWidth();
         float beta = currPitch / 180 * (float) Math.PI;    // pitch, roll and azimuth are stored in degrees in class vars
+        if(CAMERA_CHOICE == FRONT)
+            beta *= -1;
+
         float h = H / alpha * beta;
 
 //        telemetry.log().add(String.format("alpha: %.0f, beta: %.0f, h: %d", alpha*180/Math.PI, beta/Math.PI*180, (int)h));
@@ -429,19 +434,16 @@ public class BasicAuton extends LinearOpMode {
          * Here we chose the back (HiRes) camera (for greater range), but
          * for a competition robot, the front camera might be more convenient.
          */
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        parameters.cameraDirection = CAMERA_CHOICE;
 
         /**
          * Instantiate the Vuforia engine
          */
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
-        telemetry.addData(">", "Press Play to start");
-
         AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
 
         telemetry.update();
-        waitForStart();
 
         vuforia.enableConvertFrameToBitmap();
         CameraDevice.getInstance().setFlashTorchMode(true);
@@ -456,7 +458,8 @@ public class BasicAuton extends LinearOpMode {
     }
 
     public int getSkyStonePosition() {
-        int iPostion = -1;
+        String sConfig;
+        int iPosition = -1;
 
         //  sleep(500);
         //  telemetry.addData("Queue capacity: ", que.remainingCapacity());
@@ -470,6 +473,7 @@ public class BasicAuton extends LinearOpMode {
                 if (srcBmp != null) {
 
                     Bitmap stonesArea = locateStones(srcBmp, vuforia.getCameraCalibration(), currPitch, currRoll);
+                    //saveBitmapToFile(stonesArea);
                     double dstart = opmodeRunTime.milliseconds();
                     int iNumBars = 3;
                     int iLum[] = new int[3];
@@ -497,18 +501,13 @@ public class BasicAuton extends LinearOpMode {
 //                        telemetry.addData("Col RGB & RG Lum " + iBar, "%d %d %d=%d", (int) r, (int) g, (int) b, iLum[iBar]);
                     }
                     telemetry.addData("Calc Time: ", "%d milliseconds", (int) (opmodeRunTime.milliseconds() - dstart));
-                    String sConfig = "000";
                     if (iLum[0] <= iLum[1] && iLum[0] <= iLum[2]) {
-                        sConfig = "X00";
-                        iPostion = 0;
+                        iPosition = 0;
                     } else if (iLum[1] <= iLum[0] && iLum[1] <= iLum[2]) {
-                        iPostion = 1;
-                        sConfig = "0X0";
+                        iPosition = 1;
                     } else {
-                        iPostion = 2;
-                        sConfig = "00X";
+                        iPosition = 2;
                     }
-                    telemetry.addData("Configuration: ", "%s", sConfig);
                 }
             } else
                 telemetry.addData("Unable to get element ", 1);
@@ -516,7 +515,34 @@ public class BasicAuton extends LinearOpMode {
         catch (InterruptedException ex) {
         }
 
-        return iPostion;
+        // Invert stone location for FRONT camera
+        if(CAMERA_CHOICE == FRONT && iPosition != -1) {
+ //           telemetry.log().add("Camera: FRONT");
+            iPosition = 2 - iPosition;
+        }
+        else {
+   //         telemetry.log().add("Camera: BACK");
+        }
+
+        switch (iPosition) {
+            case 0:
+                sConfig = "X00";
+                break;
+            case 1:
+                sConfig = "0X0";
+                break;
+            case 2:
+                sConfig = "00X";
+                break;
+
+                default:
+                    sConfig = "000";
+                    break;
+        }
+
+        telemetry.addData("Skystone Configuration: ", "%s", sConfig);
+
+        return iPosition;
     }
 
     /**
