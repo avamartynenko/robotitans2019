@@ -17,7 +17,7 @@ public class LiftMech {
     public double GRABBER_LOCK_POSITION = 0.95; //
     public double GRABBER_RELEASE_POSITION = 0.4; // 0.2
     public double TWISTER_HOME_POSITION = 1.0; //
-    public double TWISTER_DELIVER_POSITION = 0.25;
+    public double TWISTER_DELIVER_POSITION = 0.23;
 
 
 

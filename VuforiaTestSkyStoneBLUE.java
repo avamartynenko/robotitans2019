@@ -51,6 +51,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.FORWARD;
+import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.GYRO_LEFT;
+import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.GYRO_RIGHT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.LEFT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.REVERSE;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT;
@@ -146,7 +148,7 @@ public class VuforiaTestSkyStoneBLUE extends BasicAuton {
     private int targetPostion = 0;
 
     private double safeDistanceOffset = 3;
-    private double dropZoneOffset = 90;
+    private double dropZoneOffset = 95;
     private double slowMoSpeed = .4;
     private int sleepTime = 100;
     private int detectionWaitTime = 2000;
@@ -347,7 +349,7 @@ public class VuforiaTestSkyStoneBLUE extends BasicAuton {
         targetsSkyStone.activate();
 
         robot.linearMove(REVERSE, slowMoSpeed,5);
-        robot.linearMove(LEFT, slowMoSpeed,18.5);
+        robot.linearMove(RIGHT, slowMoSpeed,18.5);
         sleep(detectionWaitTime);
 
         if (opModeIsActive()) {
@@ -410,7 +412,7 @@ public class VuforiaTestSkyStoneBLUE extends BasicAuton {
     public void repositionAndPickupSkystone(){
 
         robot.linearMove(FORWARD, slowMoSpeed, 5);
-        robot.linearMove(LEFT, slowMoSpeed, 8);
+        robot.linearMove(RIGHT, slowMoSpeed, 8);
         //pickUpSkyStone();
         choiceOfArm.latchStone(1.0);
         choiceOfArm.goDown(1.0);
@@ -430,35 +432,40 @@ public class VuforiaTestSkyStoneBLUE extends BasicAuton {
         }
         robot.linearMove(FORWARD, MAX_SPEED, dropZoneOffset - 20 + initialOffset, this);
         robot.activateSpeedProfile = false;
-        robot.linearMove(LEFT, slowMoSpeed, 15, this);
+        robot.linearMove(RIGHT, slowMoSpeed, 10, this);
 
         placeSkyStoneOnFoundation();
 
         //dropCube();  // basic auton will get the proper arm by its self
 
         // pullback and rotate
-        linearMoveWrapper(RIGHT, MAX_SPEED*0.6, 3);
+        linearMoveWrapper(LEFT, MAX_SPEED*0.6, 3);
         //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
-        robot.gyroMove(CompetitionHardware.Direction.GYRO_RIGHT, MAX_SPEED*0.8,65);
+        robot.gyroMove(CompetitionHardware.Direction.GYRO_LEFT, MAX_SPEED*0.8,65);
 
         //reOrient();  // will change orientation based on alliance color
 
-        linearMoveWrapper(FORWARD, slowMoSpeed, 10);
+        linearMoveWrapper(REVERSE, slowMoSpeed, 10);
 
         // Grab and pull the platform
         robot.hookLatch.latch();
         sleep(latchTime);
+        robot.gyroMove2(GYRO_RIGHT, 5, telemetry); //orig 8 7th Dec
+
 
         // pull platform back
         //linearMoveWrapper(robot.FORWARD, 32, false);
-        linearMoveWrapper(REVERSE, MAX_SPEED, 36);
+        linearMoveWrapper(FORWARD, MAX_SPEED, 36);
+
+        robot.gyroMove2(GYRO_LEFT, 10, telemetry); //newly added
+
 
         robot.hookLatch.release();
 
         // push platform to the corner
         linearMoveWrapper(LEFT, MAX_SPEED,37);
 
-        linearMoveWrapper(FORWARD, MAX_SPEED,22);
+        linearMoveWrapper(REVERSE, MAX_SPEED,22);
 
         // retreat and park under the bridge
 

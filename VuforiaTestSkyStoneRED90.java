@@ -462,14 +462,16 @@ public class VuforiaTestSkyStoneRED90 extends BasicAuton {
         robot.hookLatch.latch();
         sleep(latchTime);
         telemetry.log().add("Performing gyro move at 10");
-        robot.gyroMove2(GYRO_LEFT, 5, telemetry); //orig 8 7th Dec
+        robot.gyroMove2(GYRO_RIGHT, 5, telemetry); //orig 8 7th Dec
 
         // pull platform back
         //linearMoveWrapper(robot.FORWARD, 32, false);
-        linearMoveWrapper(FORWARD, MAX_SPEED, 34);  // TO BE CHECKED orig 36  7th Dec
-        robot.gyroMove2(GYRO_RIGHT, 10, telemetry); //newly added
+        linearMoveWrapper(FORWARD, MAX_SPEED, 17);  // TO BE CHECKED orig 34
+        robot.gyroMove2(GYRO_RIGHT, 90, telemetry); //newly added
 
         robot.hookLatch.release();
+
+        /*
 
         int lastMoveDistance = 42;
         // 37
@@ -487,6 +489,8 @@ public class VuforiaTestSkyStoneRED90 extends BasicAuton {
 
 
         linearMoveWrapper(RIGHT, MAX_SPEED,lastMoveDistance);
+
+         */
     }
 
     public void goForSecondStone(){
