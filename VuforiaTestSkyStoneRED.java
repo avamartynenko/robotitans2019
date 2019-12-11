@@ -90,7 +90,7 @@ import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT
 
 @Autonomous(name="RED_VuforiaTestSkyStone", group ="Concept")
 //@Disabled
-public class VuforiaTestSkyStone extends BasicAuton {
+public class VuforiaTestSkyStoneRED extends BasicAuton {
 
 
 

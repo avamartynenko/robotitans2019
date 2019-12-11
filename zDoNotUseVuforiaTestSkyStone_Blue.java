@@ -68,9 +68,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 
 @Autonomous(name="BLUE_VuforiaTestSkyStone_Ex", group ="Concept")
 @Disabled
-public class VuforiaTestSkyStone_Blue extends VuforiaTestSkyStoneBlueBase {
+public class zDoNotUseVuforiaTestSkyStone_Blue extends VuforiaTestSkyStoneBLUE {
 
-    public VuforiaTestSkyStone_Blue(){
+    public zDoNotUseVuforiaTestSkyStone_Blue(){
 
         super.setAllianceColor(BasicAuton.GAME_ALLIANCE_BLUE);
         //super.setBlueAllianceOffset(true);

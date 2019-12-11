@@ -226,6 +226,10 @@ public class BasicAuton extends LinearOpMode {
 
     }
 
+    public void setChoiceOfArm(Arm armToSet) {
+        choiceOfArm = armToSet;
+    }
+
     public void pickUpSkyStone() {
 
         choiceOfArm.latchStone(0.9);
