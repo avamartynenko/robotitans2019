@@ -89,7 +89,7 @@ public class PullFoundationRed extends BasicAuton {
         if (opModeIsActive())
         {
             reOrient();
-            //robot.linearMove(robot.LEFT,0.6,11);
+            robot.linearMove(LEFT,0.6,11); //new movement created at states
             robot.linearMove(REVERSE,0.5,32);
             //robot.linearMove(CompetitionHardware.Direction.REVERSE,0.1,2);
             robot.hookLatch.latch();
