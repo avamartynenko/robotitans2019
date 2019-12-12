@@ -29,6 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -47,6 +51,8 @@ import com.vuforia.Frame;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,6 +62,7 @@ import java.util.concurrent.BlockingQueue;
 
 import static android.content.Context.SENSOR_SERVICE;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
+import static org.opencv.imgproc.Imgproc.COLOR_BGR2HSV;
 
 /**
  *
@@ -78,7 +85,7 @@ public class BasicAuton extends LinearOpMode {
     static final double WALL_RECOIL = .5; // how far we pull back from the wall
     static final double START_SPEED = .5; // highest possible speed with no slippage
     static final double MAX_SPEED = 1.0;
-    protected static final int STONE_HEIGHT = 100; // pixels height of the are with sckystone
+    protected static final int STONE_HEIGHT = 90; // pixels height of the are with sckystone
     // azimuth, pitch and roll
     public float azimuth = 0;
     public float pitch = 0;
@@ -391,7 +398,30 @@ public class BasicAuton extends LinearOpMode {
     Bitmap locateStones(Bitmap bmp, CameraCalibration cc, float currPitch, float currRoll) {
         int horizon = horizonLine(bmp, cc, currPitch, currRoll);
 
-        return Bitmap.createBitmap(bmp, horizon - STONE_HEIGHT, 0, 2 * STONE_HEIGHT, bmp.getHeight());
+
+        Mat input = new Mat();
+        Bitmap bmp32 = bmp.copy(Bitmap.Config.ARGB_8888, true);
+        Utils.bitmapToMat(bmp32, input);
+
+        Mat hsv = new Mat();
+        Imgproc.cvtColor(input, hsv, COLOR_BGR2HSV);
+        Mat mask = new Mat();
+
+        Core.inRange(hsv, new Scalar(85, 127, 127),
+                new Scalar(115, 255, 255), mask);
+
+        Mat result = new Mat();
+        Core.bitwise_and(input, input, result, mask);
+
+        Bitmap bmpTmp = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());
+        Utils.matToBitmap(result, bmpTmp);
+
+        Bitmap bmpCrop = Bitmap.createBitmap(bmpTmp, horizon - STONE_HEIGHT, 0, 2 * STONE_HEIGHT, bmp.getHeight());
+
+        hsv.release();
+        result.release();
+
+        return bmpCrop;
     }
 
     int horizonLine(Bitmap bmp, CameraCalibration cc, float currPitch, float currRoll) {
@@ -476,7 +506,6 @@ public class BasicAuton extends LinearOpMode {
                 float currPitch = pitch;
                 Bitmap srcBmp = vuforia.convertFrameToBitmap((Frame) que.take());
                 if (srcBmp != null) {
-
                     Bitmap stonesArea = locateStones(srcBmp, vuforia.getCameraCalibration(), currPitch, currRoll);
                     //saveBitmapToFile(stonesArea);
                     double dstart = opmodeRunTime.milliseconds();
@@ -487,8 +516,8 @@ public class BasicAuton extends LinearOpMode {
                         int iBarStart = iBarHeight * iBar;
                         int iBarEnd = iBarStart + iBarHeight;
                         double r = 0, g = 0, b = 0;
-                        int ivStep = 4;
-                        int ihStep = 4;
+                        int ivStep = 5;
+                        int ihStep = 5;
                         for (int x = 0; x < stonesArea.getWidth(); x = x + ihStep) {
                             for (int y = iBarHeight * iBar; y < iBarHeight * (iBar + 1); y = y + ivStep) {
                                 int color = stonesArea.getPixel(x, y);

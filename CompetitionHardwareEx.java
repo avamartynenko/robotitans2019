@@ -28,6 +28,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODE
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 import static java.lang.Thread.sleep;
+import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.FORWARD;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.GYRO_LEFT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.GYRO_RIGHT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.REVERSE;
@@ -278,7 +279,11 @@ public class CompetitionHardwareEx extends CompetitionHardware {
         frontRight.setTargetPosition(frontRight.getTargetPosition() + (int)posIncrement);
 
         resetAngle();
-        PIDController pidDrive = new PIDController(.19, 0, 0);
+        double kp = .05;
+        if(direction == FORWARD)
+            kp = .15;
+
+        PIDController pidDrive = new PIDController(kp, 0, 0);
         // Set up parameters for driving in a straight line.
 
         pidDrive.setSetpoint(getAngle());
@@ -330,7 +335,6 @@ public class CompetitionHardwareEx extends CompetitionHardware {
             currentSpeed = Math.max((correctedTarget-currentPosition)/breakDistance, minBreakSpeed);
             pidDrive.setOutputRange(0, Math.min(currentSpeed, GLOBAL_MAX_SPEED));
 
-// new logic - always correct
             slowDownCorrection = pidDrive.performPID(getAngle());
 
             currentPosition = motor.getCurrentPosition();

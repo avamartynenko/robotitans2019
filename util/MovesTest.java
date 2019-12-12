@@ -78,7 +78,7 @@ import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT
 
 // Use fast skystone detection method by comparing brightness of the stone instead of vuforia target recognition
 @TeleOp(name="Diag: Move Test", group ="Util")
-@Disabled
+//@Disabled
 public class MovesTest extends BasicAutonEx {
 
     private int targetPostion = 0;
@@ -107,12 +107,16 @@ public class MovesTest extends BasicAutonEx {
         //robot.opStartHeading = robot.getActualHeading();
         robot.verboseTelemetry = true;
 
-/*        robot.linearMove(FORWARD, .75, 20, this);
-        robot.linearMove(LEFT, .75, 20, this);
-        robot.linearMove(REVERSE, .75, 20, this);
-        robot.linearMove(RIGHT, .75, 20, this);*/
+        robot.linearMove(FORWARD, .75, 72, this);
+        sleep(2000);
+/*        robot.linearMove(LEFT, .75, 20, this);
+        sleep(2000);*/
+        robot.linearMove(REVERSE, .75, 72, this);
+        sleep(2000);
+/*        robot.linearMove(RIGHT, .75, 20, this);
+        sleep(2000);*/
 
-        robot.gyroMove90(GYRO_LEFT, telemetry);
+/*        robot.gyroMove90(GYRO_LEFT, telemetry);
         sleep(5000);
 
         robot.gyroMove90(GYRO_RIGHT, telemetry);
@@ -122,7 +126,7 @@ public class MovesTest extends BasicAutonEx {
         sleep(5000);
 
         robot.gyroMoveByOffset(GYRO_RIGHT, 1, 90, this);
-        sleep(5000);
+        sleep(5000);*/
     }
 
 }
