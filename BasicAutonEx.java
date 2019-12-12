@@ -6,7 +6,7 @@ public class BasicAutonEx extends BasicAuton {
     // all below dimensions are in Inches
     protected static final double FRONT_ARM_OFFSET = 5; //distance from from ARM to Front sensor
     protected static final double STONE_LENGTH = 8; // lenght of skystone
-    protected static final double FIRST_STONE_DROP = 105;
+    protected static double FIRST_STONE_DROP = 105;
     protected static final double FIELD_WIDTH = 46+46+45;
     protected static final double ROBOT_LENGTH = 17;
     protected static final double ROBOT_WIDTH = 17.5;
