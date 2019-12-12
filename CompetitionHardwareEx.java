@@ -34,13 +34,13 @@ import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.REVER
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT;
 
 public class CompetitionHardwareEx extends CompetitionHardware {
-    double opStartHeading = 0;
+    public double opStartHeading = 0;
     public boolean verboseTelemetry = false;
 
-    public DistanceSensor sensorRangeF;
-    public DistanceSensor sensorRangeB;
-    public DistanceSensor sensorRangeL;
-    public DistanceSensor sensorRangeR;
+    protected DistanceSensor sensorRangeF;
+    protected DistanceSensor sensorRangeB;
+    protected DistanceSensor sensorRangeL;
+    protected DistanceSensor sensorRangeR;
 
     // you can also cast this to a Rev2mDistanceSensor if you want to use added
     // methods associated with the Rev2mDistanceSensor class.
@@ -67,8 +67,7 @@ public class CompetitionHardwareEx extends CompetitionHardware {
     final double GLOBAL_MAX_SPEED = 1;
 
     protected boolean I2CWindowsReset = false;
-
-    protected Orientation referenceAngles = null;
+    protected boolean USE_FAST_I2C = true;
 
     @Override
     public void init(HardwareMap hMap, boolean needEncoder, boolean needColorSensor, boolean needGyro) {
@@ -84,10 +83,36 @@ public class CompetitionHardwareEx extends CompetitionHardware {
         sensorRangeL = hMap.get(DistanceSensor.class, "distance_left");
         sensorRangeR = hMap.get(DistanceSensor.class, "distance_right");
 
-        sensorTimeOfFlightL = (Rev2mDistanceSensor)sensorRangeL;
-        sensorTimeOfFlightR = (Rev2mDistanceSensor)sensorRangeR;
-        sensorTimeOfFlightF = (Rev2mDistanceSensor)sensorRangeF;
-        sensorTimeOfFlightB = (Rev2mDistanceSensor)sensorRangeB;
+        if(USE_FAST_I2C) {
+            sensorRangeF.close();
+            sensorRangeB.close();
+            sensorRangeL.close();
+            sensorRangeR.close();
+
+            Iterator<LynxModule> lmIterator = hwMap.getAll(LynxModule .class).iterator();
+            LynxModule module = null;
+
+            while(lmIterator.hasNext()) {
+                LynxModule currentModule = lmIterator.next();
+                module = currentModule;
+                if(currentModule.isParent()) {
+                    sensorTimeOfFlightL = new Rev2mDistanceSensor(LynxOptimizedI2cFactory.createLynxI2cDeviceSynch(module, 1));
+                    sensorTimeOfFlightR = new Rev2mDistanceSensor(LynxOptimizedI2cFactory.createLynxI2cDeviceSynch(module, 2));
+                    sensorTimeOfFlightF = new Rev2mDistanceSensor(LynxOptimizedI2cFactory.createLynxI2cDeviceSynch(module, 3));
+                }
+                else {
+                    sensorTimeOfFlightB = new Rev2mDistanceSensor(LynxOptimizedI2cFactory.createLynxI2cDeviceSynch(module, 2));
+                }
+            }
+     }
+        else {
+            sensorTimeOfFlightL = (Rev2mDistanceSensor) sensorRangeL;
+            sensorTimeOfFlightR = (Rev2mDistanceSensor) sensorRangeR;
+            sensorTimeOfFlightF = (Rev2mDistanceSensor) sensorRangeF;
+            sensorTimeOfFlightB = (Rev2mDistanceSensor) sensorRangeB;
+        }
+
+
 
 /*        backLeft = (ExpansionHubMotor) super.backLeft;
         backRight = (ExpansionHubMotor) super.backRight;
@@ -256,7 +281,7 @@ public class CompetitionHardwareEx extends CompetitionHardware {
         PIDController pidDrive = new PIDController(.19, 0, 0);
         // Set up parameters for driving in a straight line.
 
-        pidDrive.setSetpoint(getAngle(true));
+        pidDrive.setSetpoint(getAngle());
         pidDrive.setInputRange(-90, 90);
         pidDrive.enable();
 
@@ -322,17 +347,17 @@ public class CompetitionHardwareEx extends CompetitionHardware {
         setPower4WDrive(0);
         waitToStop();
 
-        if(referenceAngles == null) { // robot is driving in reference to itself, align to initial heading
-            double correctionAngle = calcTurnAngleD(initialHeading, getAbsoluteHeading());
+        double correctionAngle = calcTurnAngleD(initialHeading, getAbsoluteHeading());
 
-            if (opMode != null && verboseTelemetry) {
-                opMode.telemetry.log().add("Positions bl " + backLeft.getCurrentPosition() + " br " + backRight.getCurrentPosition() + " fl " + frontLeft.getCurrentPosition() + " fr " + frontRight.getCurrentPosition());
-                opMode.telemetry.log().add("Final heading/correction angle " + getActualHeading() + "/" + correctionAngle);
-            }
-
-            correctHeading(initialHeading, opMode);
-            setPower4WDrive(0);
+        if (opMode != null && verboseTelemetry) {
+            opMode.telemetry.log().add("Positions bl " + backLeft.getCurrentPosition() + " br " + backRight.getCurrentPosition() + " fl " + frontLeft.getCurrentPosition() + " fr " + frontRight.getCurrentPosition());
+            opMode.telemetry.log().add("Final heading/correction angle " + getActualHeading() + "/" + correctionAngle);
         }
+
+        correctHeading(initialHeading, opMode);
+        setPower4WDrive(0);
+
+
         //setEncoder(true);
     }
 
@@ -366,7 +391,6 @@ public class CompetitionHardwareEx extends CompetitionHardware {
                 imu.close();
             }
 
-
             Iterator<LynxModule> lmIterator = hwMap.getAll(LynxModule .class).iterator();
             LynxModule module = null;
 
@@ -398,57 +422,6 @@ public class CompetitionHardwareEx extends CompetitionHardware {
         // Start the logging of measured acceleration
         //imu.startAccelerationIntegration(new Position(), new Velocity(), 100);
         //imu.stopAccelerationIntegration();
-    }
-
-    public void setReferenceAngles(boolean setAngles) {
-        if(setAngles)
-            referenceAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        else
-            referenceAngles = null;
-    }
-
-    /**
-     * Resets the cumulative angle tracking to zero or reference angle
-     */
-    @Override
-    protected void resetAngle()
-    {
-        lastAngles = (referenceAngles != null) ? referenceAngles : imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-        globalAngle = 0;
-    }
-
-    /**
-     * Get current cumulative angle rotation from last reset.
-     * @return Angle in degrees. + = left, - = right from zero point.
-     */
-    public double getAngle(boolean initialAngle)
-    {
-        // We experimentally determined the Z axis is the axis we want to use for heading angle.
-        // We have to process the angle because the imu works in euler angles so the Z axis is
-        // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
-        // 180 degrees. We detect this transition and track the total cumulative angle of rotation.
-
-        Orientation angles;
-
-        // sets initial angle equal to reference angle for PID initialization or current angle for ongoing corrections
-        if(initialAngle && referenceAngles != null)
-            angles = referenceAngles;
-        else
-            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
-
-        if (deltaAngle < -180)
-            deltaAngle += 360;
-        else if (deltaAngle > 180)
-            deltaAngle -= 360;
-
-        globalAngle += deltaAngle;
-
-        lastAngles = angles;
-
-        return globalAngle;
     }
 
     /*

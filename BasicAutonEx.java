@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 public class BasicAutonEx extends BasicAuton {
-    CompetitionHardwareEx robot;
+    public CompetitionHardwareEx robot;
 
     // all below dimensions are in Inches
     protected static final double FRONT_ARM_OFFSET = 5; //distance from from ARM to Front sensor

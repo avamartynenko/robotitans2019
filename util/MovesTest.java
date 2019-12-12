@@ -117,6 +117,7 @@ public class TwoStoneRed extends BasicAutonEx {
 
         //waitForStart();
         robot.opStartHeading = robot.getActualHeading();
+        robot.setReferenceAngles(true);
 
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
@@ -141,6 +142,7 @@ public class TwoStoneRed extends BasicAutonEx {
         robot.activateSpeedProfile = true;
         telemetry.addData("Starting move to the right", "");
         robot.linearMove(RIGHT, 1, 25, this);
+        //robot.setHeading(0, this);
 
         double FIRST_STONE_CORRECTION = 0;
         switch (iStonePos) {
@@ -166,6 +168,8 @@ public class TwoStoneRed extends BasicAutonEx {
         telemetry.log().add("Distance to Front Wall (in) " + String.format("%.1f", robot.sensorTimeOfFlightF.getDistance(INCH)));
 
         correctGain();
+
+/*
         // grab skystone
         pickUpSkyStone();
         telemetry.log().add("1st stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
@@ -223,6 +227,7 @@ public class TwoStoneRed extends BasicAutonEx {
         telemetry.log().add("2nd stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();
 
+        //robot.setHeading(0, this);
 
         // drop second skystone
         distanceFromFWall = robot.sensorTimeOfFlightF.getDistance(INCH);
@@ -238,10 +243,48 @@ public class TwoStoneRed extends BasicAutonEx {
         telemetry.log().add("2nd stone on the platform: " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();
 
-        robot.linearMove(FORWARD, 1, 32, this);
+        robot.gyroMove90(GYRO_LEFT, telemetry);
 
+        // TODO: update gyro move to update reference angles after rotation
+//        robot.setReferenceAngles(true);
 
+        telemetry.log().add("Completed 90 turn: " + String.format("%.1f", opmodeRunTime.seconds()));
+        telemetry.update();
+
+        distanceFromFWall = robot.sensorTimeOfFlightF.getDistance(INCH);
+        double correction = 30.5 - distanceFromFWall;
+        robot.linearMove(REVERSE, .5, correction, this);
+
+        robot.hookLatch.latch();
+        sleep(latchTime);
+
+        telemetry.log().add("Latched: " + String.format("%.1f", opmodeRunTime.seconds()));
+        telemetry.update();
+
+        robot.gyroMove90(GYRO_RIGHT, telemetry);
+
+        telemetry.log().add("90 turn completed: " + String.format("%.1f", opmodeRunTime.seconds()));
+        telemetry.update();
+*/
         sleep(10000);
+
+
+        /*
+        if(SkyStoneOffset > 0)
+            robot.linearMove(REVERSE, MAX_SPEED, SkyStoneOffset, this);
+        else
+            robot.linearMove(FORWARD, MAX_SPEED, -SkyStoneOffset, this);
+
+        robot.linearMove(RIGHT, MAX_SPEED,25.5, this);
+
+        pickupStone();
+        if(false) {
+            deliverStone();
+            //goForSecondStone();
+            parkUnderTheBridge();
+        }
+
+ */
     }
 
     public void correctGain() {
@@ -262,5 +305,68 @@ public class TwoStoneRed extends BasicAutonEx {
         }
 
         telemetry.update();
+    }
+
+    public void deliverStone(){
+        robot.linearMove(CompetitionHardware.Direction.LEFT, slowMoSpeed, safeDistanceOffset);
+        sleep(750);
+        double initialOffset = 8 * (2 - targetPostion); // stone dimentions are 8x4x5
+        robot.linearMove(REVERSE, MAX_SPEED, dropZoneOffset - 16 + initialOffset);
+        robot.linearMove(RIGHT, slowMoSpeed, 4);
+
+        placeSkyStoneOnFoundation();
+
+        //dropCube();  // basic auton will get the proper arm by its self
+
+        // pullback and rotate
+        linearMoveWrapper(CompetitionHardware.Direction.LEFT, MAX_SPEED*0.6, 3);
+        //robot.linearMove(robot.GYRO_LEFT, MAX_SPEED, 21);
+        robot.gyroMove(CompetitionHardware.Direction.GYRO_LEFT, MAX_SPEED*0.8,75);
+
+        reOrient();  // will change orientation based on alliance color
+
+        linearMoveWrapper(REVERSE, slowMoSpeed, 10);
+
+        // Grab and pull the platform
+        robot.hookLatch.latch();
+        sleep(latchTime);
+
+        // pull platform back
+        //linearMoveWrapper(robot.FORWARD, 32, false);
+        linearMoveWrapper(FORWARD, MAX_SPEED, 36);
+
+        robot.hookLatch.release();
+
+        // push platform to the corner
+        linearMoveWrapper(RIGHT, MAX_SPEED,37);
+
+        linearMoveWrapper(REVERSE, MAX_SPEED,23);
+
+        // retreat and park under the bridge
+
+        linearMoveWrapper(RIGHT, MAX_SPEED,22);
+    }
+
+    public void goForSecondStone(){
+        return;
+
+/*        robot.gyroMove(robot.GYRO_RIGHT, slowMoSpeed, 3);
+        double initialOffset = 8 * (2 - targetPostion); // stone dimentions are 8x4x5
+
+        robot.linearMove(robot.FORWARD, MAX_SPEED, dropZoneOffset+24 -16 + initialOffset);
+        robot.linearMove(robot.RIGHT, slowMoSpeed, safeDistanceOffset);
+
+        pickUpSkyStone();
+
+        robot.linearMove(robot.LEFT, slowMoSpeed, safeDistanceOffset);
+        robot.linearMove(robot.REVERSE, MAX_SPEED, dropZoneOffset+24 -16 + initialOffset);
+        placeSkyStoneOnFoundation();*/
+    }
+
+    public void parkUnderTheBridge(){
+        return;
+
+        // robot.linearMove(robot.LEFT, slowMoSpeed, safeDistanceOffset);
+        // robot.linearMove(robot.FORWARD, MAX_SPEED, 40);
     }
 }
