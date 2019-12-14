@@ -196,8 +196,8 @@ public class DistanceSensors extends LinearOpMode  {
             telemetry.addLine("Distance Sensors")
                     .addData("Front", df.format(robot.sensorTimeOfFlightF.getDistance(INCH)))
                     .addData("Back", df.format(robot.sensorTimeOfFlightB.getDistance(INCH)))
-                    .addData("Left", df.format(robot.sensorTimeOfFlightL.getDistance(INCH)))
-                    .addData("Right", df.format(robot.sensorTimeOfFlightR.getDistance(INCH)));
+                    .addData("Left", df.format(robot.sensorTimeOfFlightL.getDistance(INCH)));
+                 //   .addData("Right", df.format(robot.sensorTimeOfFlightR.getDistance(INCH)));
 
             /**
              * Transmit the telemetry to the driver station, subject to throttling.

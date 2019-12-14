@@ -432,7 +432,7 @@ public class VuforiaTestSkyStoneBLUE extends BasicAuton {
         }
         robot.linearMove(FORWARD, MAX_SPEED, dropZoneOffset - 20 + initialOffset, this);
         robot.activateSpeedProfile = false;
-        robot.linearMove(RIGHT, slowMoSpeed, 10, this);
+        robot.linearMove(RIGHT, slowMoSpeed, 8, this);
 
         placeSkyStoneOnFoundation();
 
@@ -445,7 +445,7 @@ public class VuforiaTestSkyStoneBLUE extends BasicAuton {
 
         //reOrient();  // will change orientation based on alliance color
 
-        linearMoveWrapper(REVERSE, slowMoSpeed, 10);
+        linearMoveWrapper(REVERSE, slowMoSpeed, 12);
 
         // Grab and pull the platform
         robot.hookLatch.latch();

@@ -148,7 +148,7 @@ public class VuforiaTestSkyStoneRED extends BasicAuton {
     private int targetPostion = 0;
 
     private double safeDistanceOffset = 3;
-    private double dropZoneOffset = 78;  //78
+    private double dropZoneOffset = 85;  //78
     private double slowMoSpeed = .4;
     private int sleepTime = 100;
     private int detectionWaitTime = 2000;
@@ -467,7 +467,7 @@ public class VuforiaTestSkyStoneRED extends BasicAuton {
         // pull platform back
         //linearMoveWrapper(robot.FORWARD, 32, false);
         linearMoveWrapper(FORWARD, MAX_SPEED, 34);  // TO BE CHECKED orig 36  7th Dec
-        robot.gyroMove2(GYRO_RIGHT, 10, telemetry); //newly added
+        robot.gyroMove2(GYRO_RIGHT, 15, telemetry); //newly added
 
         robot.hookLatch.release();
 

@@ -33,23 +33,17 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.FORWARD;
-import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.LEFT;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.REVERSE;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT;
 
 // Use fast skystone detection method by comparing brightness of the stone instead of vuforia target recognition
-@Autonomous(name="Blue - 2 SkyStones Deliver & Place", group ="Competition")
+@Autonomous(name="Red - 3 SkyStones Deliver", group ="Competition")
 //@Disabled
-public class TwoStoneBlueDP extends BasicAutonEx {
+public class ThreeStoneRedD extends BasicAutonEx {
 
     @Override public void runOpMode() {
-        FIRST_STONE_DROP = 120;
-
         telemetry.addLine("Initializing robot. Please wait...");
         super.initialize();
-
-        allianceColor = GAME_ALLIANCE_BLUE;
-        setChoiceOfArm();
 
         telemetry.addLine("Init Completed. Detecting Skystone :)");
         telemetry.update();
@@ -74,24 +68,13 @@ public class TwoStoneBlueDP extends BasicAutonEx {
 
         telemetry.log().add("Starting Auton at: " + String.format("%.1f", opmodeRunTime.seconds()));
 
+        //waitForStart();
         robot.opStartHeading = robot.getActualHeading();
 
 
         robot.activateSpeedProfile = true;
-        telemetry.log().add("Starting move to the left", "");
+        telemetry.log().add("Starting move to the right");
         robot.linearMove(RIGHT, 1, 25, this);
-
-        //reverse stone postion for stones collection
-        switch (iStonePos) {
-            case 2:
-                iStonePos = 0;
-                break;
-            case 0:
-                iStonePos = 2;
-                break;
-                default:
-                    break;
-        }
 
         double FIRST_STONE_CORRECTION = 0;
         switch (iStonePos) {
@@ -99,55 +82,55 @@ public class TwoStoneBlueDP extends BasicAutonEx {
                 FIRST_STONE_CORRECTION = 1.5;
                 break;
             case 1:
-                FIRST_STONE_CORRECTION = 3.5;
+                FIRST_STONE_CORRECTION = 1.5;
                 break;
             case 2:
-                FIRST_STONE_CORRECTION = 2.5;
+                FIRST_STONE_CORRECTION = 1.5;
                 break;
         }
 
-        double distanceFromBWall = getSensorValue(robot.sensorTimeOfFlightB, INCH);
+        double distanceFromFWall = getSensorValue(robot.sensorTimeOfFlightF, INCH); // store distance
+
         telemetry.log().add("Adjusted stone pos " + iStonePos);
-        telemetry.log().add("Distance to Back Wall (in)" + String.format("%.1f", distanceFromBWall));
+        telemetry.log().add("Distance to Front Wall (in)" + String.format("%.1f", distanceFromFWall));
         telemetry.update();
 
-        double offsetToFirstSkyStone = distanceFromBWall - iStonePos*STONE_LENGTH - FIRST_STONE_CORRECTION;
-        telemetry.log().add("requested offset " + offsetToFirstSkyStone);
-        robot.linearMove(REVERSE, .9, offsetToFirstSkyStone, this);
+        double offsetToFirstSkyStone = distanceFromFWall - iStonePos*STONE_LENGTH - FIRST_STONE_CORRECTION;
+        robot.linearMove(FORWARD, .9, offsetToFirstSkyStone, this);
         telemetry.log().add("In position for 1st stone: " + String.format("%.1f", opmodeRunTime.seconds()));
-        telemetry.log().add("Distance to Back Wall (in) [dirty] " + String.format("%.1f", robot.sensorTimeOfFlightB.getDistance(INCH)));
+        telemetry.log().add("Distance to Front Wall (in) " + String.format("%.1f", robot.sensorTimeOfFlightF.getDistance(INCH)));
 
-        correctGain(false);
-        // grab skystone
-        pickUpSkyStone();
-
-        telemetry.log().add("1st stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
-        telemetry.update();
-
-        //robot.setHeading(0, this);
+    correctGain(false);
+    // grab skystone
+    pickUpSkyStone();
+    telemetry.log().add("1st stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
+    telemetry.update();
+    //robot.setHeading(0, this);
 
         // adjusting drop point to allow alliance robot to move foundation
-        //FIRST_STONE_DROP -= 32;
+        FIRST_STONE_DROP -= 35;
 
         // drop first skystone
-        distanceFromBWall = getSensorValue(robot.sensorTimeOfFlightB, INCH);
-        telemetry.log().add("Distance from back wall at collection: " + String.format("%.1f", distanceFromBWall));
-        robot.linearMove(FORWARD, 1, FIRST_STONE_DROP - distanceFromBWall, this);
+        distanceFromFWall = (iStonePos == 0) ? 0 : getSensorValue(robot.sensorTimeOfFlightF, INCH); // sometimes sensor reads distance through the glass in the right most postion
+        distanceFromFWall -= 15;
 
+        //FIRST_STONE_DROP += (2 - iStonePos) * STONE_LENGTH;
 
-        telemetry.log().add("In position to drop 1st stone: " + String.format("%.1f", opmodeRunTime.seconds()));
-        telemetry.update();
+        telemetry.log().add("Distance from front wall at collection: " + String.format("%.1f", distanceFromFWall));
+        robot.linearMove(REVERSE, 1, FIRST_STONE_DROP - distanceFromFWall, this);
 
+    telemetry.log().add("In position to drop 1st stone: " + String.format("%.1f", opmodeRunTime.seconds()));
+    telemetry.update();
+/*
         // gain correction not required for drop off program
-        correctGain(true);
+        correctGain();
+*/
 
+    placeSkyStoneOnFoundation();
+    telemetry.log().add("1st stone on the platform: " + String.format("%.1f", opmodeRunTime.seconds()));
+    telemetry.update();
 
-        placeSkyStoneOnFoundation();
-        telemetry.log().add("1st stone on the platform: " + String.format("%.1f", opmodeRunTime.seconds()));
-        telemetry.update();
-
-        robot.setHeading(robot.opStartHeading, this);
-
+/*
         //align and collect 2nd stone
         double distanceFromFWall = getSensorValue(robot.sensorTimeOfFlightF, INCH);
 
@@ -169,45 +152,70 @@ public class TwoStoneBlueDP extends BasicAutonEx {
         telemetry.log().add("2nd stone pick. distance from Front wall " + String.format("%.1f", distanceFromBWall) + ". Second stone pic: " + String.format("%.1f", sendStonePick));
         robot.linearMove(REVERSE, 1, sendStonePick, this);
 
-
-        // robot needs to idle a little, otherwise sensor report unreliable data
+*/
+        robot.linearMove(FORWARD, 1, FIRST_STONE_DROP - distanceFromFWall - 24 - 1, this); // robot overshoots a little, so we reduce it by two inches
+                // robot needs to idle a little, otherwise sensor report unreliable data
         sleep(50);
-        correctGain(true);
+        correctGain(false);
 
-        // TODO: add front wall correction
+    // TODO: add front wall correction
 
-        telemetry.log().add("In position for 2nd stone: " + String.format("%.1f", opmodeRunTime.seconds()));
+    telemetry.log().add("In position for 2nd stone: " + String.format("%.1f", opmodeRunTime.seconds()));
 
-        // grab 2nd skystone
-        pickUpSkyStone(true);
-        telemetry.log().add("2nd stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
-        telemetry.update();
+    // grab 2nd skystone
+    pickUpSkyStone(true);
+    telemetry.log().add("2nd stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
+    telemetry.update();
+
+        // correct heading
+        robot.setHeading(robot.opStartHeading, this);
 
         // adjust drop pint for second stone
-        //FIRST_STONE_DROP += 8;
+        FIRST_STONE_DROP += 8;
 
         // drop second skystone
-        distanceFromBWall = getSensorValue(robot.sensorTimeOfFlightB, INCH);
-        telemetry.log().add("Distance from wall at collection: " + String.format("%.1f", distanceFromBWall));
-        robot.linearMove(FORWARD, 1, FIRST_STONE_DROP - distanceFromBWall-12, this);
+        distanceFromFWall = getSensorValue(robot.sensorTimeOfFlightF, INCH);
+        telemetry.log().add("Distance from wall at collection: " + String.format("%.1f", distanceFromFWall));
+        robot.linearMove(REVERSE, 1, FIRST_STONE_DROP - distanceFromFWall, this);
         telemetry.log().add("In position to drop 2nd stone: " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();
 
-
+/*
         // gain correction not required for drop only program
-        correctGain(true);
-
+        correctGain();
+*/
         placeSkyStoneOnFoundation();
+        robot.setHeading(robot.opStartHeading, this);
+
+        if(true) {
+            double thridStoneOffset = FIRST_STONE_DROP - distanceFromFWall;
+            switch (iStonePos) {
+                case 0:
+                    thridStoneOffset -= 16;
+                    break;
+                case 1:
+                    thridStoneOffset -= 8;
+                    break;
+                case 2:
+                    thridStoneOffset += 8;
+                    break;
+
+            }
+            robot.linearMove(FORWARD, 1, thridStoneOffset, this);
+            correctGain(false);
+            pickUpSkyStone();
+            robot.linearMove(REVERSE, 1, thridStoneOffset, this);
+            placeSkyStoneOnFoundation();
+        }
 
         telemetry.log().add("2nd stone on the platform: " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();
 
-        robot.linearMove(REVERSE, 1, 45, this);
+    robot.linearMove(FORWARD, 1, 19, this);
 
         telemetry.log().add("Under the bridge " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();
 
-
-//        sleep(10000);
+//    sleep(10000);
     }
 }

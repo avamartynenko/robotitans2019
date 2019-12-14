@@ -46,7 +46,7 @@ public class CompetitionHardwareEx extends CompetitionHardware {
     // you can also cast this to a Rev2mDistanceSensor if you want to use added
     // methods associated with the Rev2mDistanceSensor class.
     public Rev2mDistanceSensor sensorTimeOfFlightL;
-    public Rev2mDistanceSensor sensorTimeOfFlightR;
+//    public Rev2mDistanceSensor sensorTimeOfFlightR;
     public Rev2mDistanceSensor sensorTimeOfFlightF;
     public Rev2mDistanceSensor sensorTimeOfFlightB;
 
@@ -68,7 +68,7 @@ public class CompetitionHardwareEx extends CompetitionHardware {
     final double GLOBAL_MAX_SPEED = 1;
 
     protected boolean I2CWindowsReset = false;
-    protected boolean USE_FAST_I2C = true;
+    protected boolean USE_FAST_I2C = false;
 
     @Override
     public void init(HardwareMap hMap, boolean needEncoder, boolean needColorSensor, boolean needGyro) {
@@ -82,13 +82,13 @@ public class CompetitionHardwareEx extends CompetitionHardware {
         sensorRangeF = hMap.get(DistanceSensor.class, "distance_front");
         sensorRangeB = hMap.get(DistanceSensor.class, "distance_back");
         sensorRangeL = hMap.get(DistanceSensor.class, "distance_left");
-        sensorRangeR = hMap.get(DistanceSensor.class, "distance_right");
+//        sensorRangeR = hMap.get(DistanceSensor.class, "distance_right");
 
         if(USE_FAST_I2C) {
             sensorRangeF.close();
             sensorRangeB.close();
             sensorRangeL.close();
-            sensorRangeR.close();
+//            sensorRangeR.close();
 
             Iterator<LynxModule> lmIterator = hwMap.getAll(LynxModule .class).iterator();
             LynxModule module = null;
@@ -98,7 +98,7 @@ public class CompetitionHardwareEx extends CompetitionHardware {
                 module = currentModule;
                 if(currentModule.isParent()) {
                     sensorTimeOfFlightL = new Rev2mDistanceSensor(LynxOptimizedI2cFactory.createLynxI2cDeviceSynch(module, 1));
-                    sensorTimeOfFlightR = new Rev2mDistanceSensor(LynxOptimizedI2cFactory.createLynxI2cDeviceSynch(module, 2));
+//                    sensorTimeOfFlightR = new Rev2mDistanceSensor(LynxOptimizedI2cFactory.createLynxI2cDeviceSynch(module, 2));
                     sensorTimeOfFlightF = new Rev2mDistanceSensor(LynxOptimizedI2cFactory.createLynxI2cDeviceSynch(module, 3));
                 }
                 else {
@@ -108,7 +108,7 @@ public class CompetitionHardwareEx extends CompetitionHardware {
      }
         else {
             sensorTimeOfFlightL = (Rev2mDistanceSensor) sensorRangeL;
-            sensorTimeOfFlightR = (Rev2mDistanceSensor) sensorRangeR;
+//            sensorTimeOfFlightR = (Rev2mDistanceSensor) sensorRangeR;
             sensorTimeOfFlightF = (Rev2mDistanceSensor) sensorRangeF;
             sensorTimeOfFlightB = (Rev2mDistanceSensor) sensorRangeB;
         }

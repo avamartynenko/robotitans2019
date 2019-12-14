@@ -242,7 +242,7 @@ public class BasicAuton extends LinearOpMode {
         choiceOfArm.latchStone(0.9);
         choiceOfArm.goDown(0.9);
 
-        sleep(1000);
+        sleep(1200);
 
         //sleep(1000);
 

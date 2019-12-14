@@ -78,7 +78,7 @@ import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT
 
 // Use fast skystone detection method by comparing brightness of the stone instead of vuforia target recognition
 @TeleOp(name="Diag: Move Test", group ="Util")
-//@Disabled
+@Disabled
 public class MovesTest extends BasicAutonEx {
 
     private int targetPostion = 0;
