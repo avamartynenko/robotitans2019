@@ -73,7 +73,6 @@ public class ThreeStoneBlueD extends BasicAutonEx {
 
         robot.opStartHeading = robot.getActualHeading();
 
-
         robot.activateSpeedProfile = true;
         telemetry.log().add("Starting move to the right");
         robot.linearMove(RIGHT, 1, 25, this);
@@ -204,26 +203,24 @@ public class ThreeStoneBlueD extends BasicAutonEx {
         placeSkyStoneOnFoundation();
         robot.setHeading(robot.opStartHeading, this);
 
-        if(true) {
-            double thridStoneOffset = FIRST_STONE_DROP - distanceFromBWall;
-            switch (iStonePos) {
-                case 0:
-                    thridStoneOffset -= 16;
-                    break;
-                case 1:
-                    thridStoneOffset -= 8;
-                    break;
-                case 2:
-                    thridStoneOffset += 8;
-                    break;
+        double thridStoneOffset = FIRST_STONE_DROP - distanceFromBWall;
+        switch (iStonePos) {
+            case 0:
+                thridStoneOffset -= 16;
+                break;
+            case 1:
+                thridStoneOffset -= 8;
+                break;
+            case 2:
+                thridStoneOffset += 8;
+                break;
 
-            }
-            robot.linearMove(REVERSE, 1, thridStoneOffset, this);
-            correctGain(false);
-            pickUpSkyStone();
-            robot.linearMove(FORWARD, 1, thridStoneOffset, this);
-            placeSkyStoneOnFoundation();
         }
+        robot.linearMove(REVERSE, 1, thridStoneOffset, this);
+        correctGain(false);
+        pickUpSkyStone();
+        robot.linearMove(FORWARD, 1, thridStoneOffset, this);
+        placeSkyStoneOnFoundation();
 
         telemetry.log().add("2nd stone on the platform: " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();
@@ -232,7 +229,5 @@ public class ThreeStoneBlueD extends BasicAutonEx {
 
         telemetry.log().add("Under the bridge " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();
-
-//    sleep(10000);
     }
 }

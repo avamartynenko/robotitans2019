@@ -78,17 +78,6 @@ import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.RIGHT
 @Autonomous(name="Red - 2 SkyStones Deliver & Place", group ="Competition")
 //@Disabled
 public class TwoStoneRedDP extends BasicAutonEx {
-
-    private int targetPostion = 0;
-
-    private double safeDistanceOffset = 3;
-    private double dropZoneOffset = 90;
-    private double slowMoSpeed = .4;
-    private int sleepTime = 100;
-    private int detectionWaitTime = 2000;
-    private int latchTime = 1250;
-
-
     @Override public void runOpMode() {
         telemetry.addLine("Initializing robot. Please wait...");
         super.initialize();
@@ -123,8 +112,6 @@ public class TwoStoneRedDP extends BasicAutonEx {
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
 
-        //telemetry.addData("Offset ", "%.0f", SkyStoneOffset);
-
         robot.activateSpeedProfile = true;
         telemetry.log().add("Adjusted stone pos " + iStonePos);
         telemetry.log().add("Starting move to the right");
@@ -153,83 +140,76 @@ public class TwoStoneRedDP extends BasicAutonEx {
         telemetry.log().add("In position for 1st stone: " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.log().add("Distance to Front Wall (in) " + String.format("%.1f", robot.sensorTimeOfFlightF.getDistance(INCH)));
 
-    correctGain(false);
-    // grab skystone
-    pickUpSkyStone();
-    telemetry.log().add("1st stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
-    telemetry.update();
-    //robot.setHeading(0, this);
+        correctGain(false);
+        // grab skystone
+        pickUpSkyStone();
+        telemetry.log().add("1st stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
+        telemetry.update();
+        //robot.setHeading(0, this);
 
-    // drop first skystone
-    distanceFromFWall = robot.sensorTimeOfFlightF.getDistance(INCH) - 15;
-    telemetry.log().add("Distance from front wall at collection: " + String.format("%.1f", distanceFromFWall));
-    robot.linearMove(REVERSE, 1, FIRST_STONE_DROP - distanceFromFWall, this);
-    //robot.linearMoveEncoder(REVERSE, 1, FIRST_STONE_DROP - distanceFromFWall, this);
+        // drop first skystone
+        distanceFromFWall = robot.sensorTimeOfFlightF.getDistance(INCH) - 15;
+        telemetry.log().add("Distance from front wall at collection: " + String.format("%.1f", distanceFromFWall));
+        robot.linearMove(REVERSE, 1, FIRST_STONE_DROP - distanceFromFWall, this);
+        //robot.linearMoveEncoder(REVERSE, 1, FIRST_STONE_DROP - distanceFromFWall, this);
 
-    telemetry.log().add("In position to drop 1st stone: " + String.format("%.1f", opmodeRunTime.seconds()));
-    telemetry.update();
+        telemetry.log().add("In position to drop 1st stone: " + String.format("%.1f", opmodeRunTime.seconds()));
+        telemetry.update();
 
-    // correct gain
-    correctGain(true);
+        // correct gain
+        correctGain(true);
 
-    placeSkyStoneOnFoundation();
-    telemetry.log().add("1st stone on the platform: " + String.format("%.1f", opmodeRunTime.seconds()));
-    telemetry.update();
+        placeSkyStoneOnFoundation();
+        telemetry.log().add("1st stone on the platform: " + String.format("%.1f", opmodeRunTime.seconds()));
+        telemetry.update();
 
-    robot.setHeading(robot.opStartHeading, this);
+        robot.setHeading(robot.opStartHeading, this);
 
-    //align and collect 2nd stone
-    double distanceFromBWall = robot.sensorTimeOfFlightB.getDistance(INCH);
+        //align and collect 2nd stone
+        double distanceFromBWall = robot.sensorTimeOfFlightB.getDistance(INCH);
 
-    double secondSkyStoneCorrection = 0;
-    switch (iStonePos) {
-        case 0:
-            secondSkyStoneCorrection = 6.5;
-            break;
-        case 1:
-            secondSkyStoneCorrection = 5.5;
-            break;
-        case 2:
-            secondSkyStoneCorrection = 5;
-            break;
-    }
+        double secondSkyStoneCorrection = 0;
+        switch (iStonePos) {
+            case 0:
+                secondSkyStoneCorrection = 6.5;
+                break;
+            case 1:
+                secondSkyStoneCorrection = 5.5;
+                break;
+            case 2:
+                secondSkyStoneCorrection = 5;
+                break;
+        }
 
+        double sendStonePick = FIELD_WIDTH - distanceFromBWall - 8 * (3 + iStonePos) - ROBOT_LENGTH + secondSkyStoneCorrection;
+        telemetry.log().add("2nd stone pick. distance from Back wall " + String.format("%.1f", distanceFromBWall) + ". Second stone pic: " + String.format("%.1f", sendStonePick));
+        robot.linearMove(FORWARD, 1, sendStonePick, this);
 
-    double sendStonePick = FIELD_WIDTH - distanceFromBWall - 8 * (3 + iStonePos) - ROBOT_LENGTH + secondSkyStoneCorrection;
-    telemetry.log().add("2nd stone pick. distance from Back wall " + String.format("%.1f", distanceFromBWall) + ". Second stone pic: " + String.format("%.1f", sendStonePick));
-    robot.linearMove(FORWARD, 1, sendStonePick, this);
+        correctGain(false);
 
-    // robot needs to idle a little, otherwise sensor report unreliable data
-    sleep(50);
-    correctGain(false);
+        // TODO: add front wall correction
 
-    // TODO: add front wall correction
+        telemetry.log().add("In position for 2nd stone: " + String.format("%.1f", opmodeRunTime.seconds()));
 
-    telemetry.log().add("In position for 2nd stone: " + String.format("%.1f", opmodeRunTime.seconds()));
+        // grab 2nd skystone
+        pickUpSkyStone(true);
+        telemetry.log().add("2nd stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
+        telemetry.update();
 
-    // grab 2nd skystone
-    pickUpSkyStone(true);
-    telemetry.log().add("2nd stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
-    telemetry.update();
+        // drop second skystone
+        distanceFromFWall = robot.sensorTimeOfFlightF.getDistance(INCH);
+        telemetry.log().add("Distance from wall at collection: " + String.format("%.1f", distanceFromFWall));
+        robot.linearMove(REVERSE, 1, FIRST_STONE_DROP - distanceFromFWall, this);
+        telemetry.log().add("In position to drop 2nd stone: " + String.format("%.1f", opmodeRunTime.seconds()));
+        telemetry.update();
 
+        // correct gain
+        correctGain(true);
 
-    // drop second skystone
-    distanceFromFWall = robot.sensorTimeOfFlightF.getDistance(INCH);
-    telemetry.log().add("Distance from wall at collection: " + String.format("%.1f", distanceFromFWall));
-    robot.linearMove(REVERSE, 1, FIRST_STONE_DROP - distanceFromFWall, this);
-    telemetry.log().add("In position to drop 2nd stone: " + String.format("%.1f", opmodeRunTime.seconds()));
-    telemetry.update();
+        placeSkyStoneOnFoundation();
+        telemetry.log().add("2nd stone on the platform: " + String.format("%.1f", opmodeRunTime.seconds()));
+        telemetry.update();
 
-    // correct gain
-    correctGain(true);
-
-    placeSkyStoneOnFoundation();
-    telemetry.log().add("2nd stone on the platform: " + String.format("%.1f", opmodeRunTime.seconds()));
-    telemetry.update();
-
-    robot.linearMove(FORWARD, 1, 35, this);
-
-
-//    sleep(10000);
+        robot.linearMove(FORWARD, 1, 35, this);
     }
 }

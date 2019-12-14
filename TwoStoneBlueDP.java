@@ -76,7 +76,6 @@ public class TwoStoneBlueDP extends BasicAutonEx {
 
         robot.opStartHeading = robot.getActualHeading();
 
-
         robot.activateSpeedProfile = true;
         telemetry.log().add("Starting move to the left", "");
         robot.linearMove(RIGHT, 1, 25, this);
@@ -164,11 +163,9 @@ public class TwoStoneBlueDP extends BasicAutonEx {
                 break;
         }
 
-
         double sendStonePick = FIELD_WIDTH - distanceFromFWall - 8 * (3 + iStonePos) - ROBOT_LENGTH + secondSkyStoneCorrection;
         telemetry.log().add("2nd stone pick. distance from Front wall " + String.format("%.1f", distanceFromBWall) + ". Second stone pic: " + String.format("%.1f", sendStonePick));
         robot.linearMove(REVERSE, 1, sendStonePick, this);
-
 
         // robot needs to idle a little, otherwise sensor report unreliable data
         sleep(50);
@@ -193,7 +190,6 @@ public class TwoStoneBlueDP extends BasicAutonEx {
         telemetry.log().add("In position to drop 2nd stone: " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();
 
-
         // gain correction not required for drop only program
         correctGain(true);
 
@@ -206,8 +202,5 @@ public class TwoStoneBlueDP extends BasicAutonEx {
 
         telemetry.log().add("Under the bridge " + String.format("%.1f", opmodeRunTime.seconds()));
         telemetry.update();
-
-
-//        sleep(10000);
     }
 }
