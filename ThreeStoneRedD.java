@@ -108,7 +108,7 @@ public class ThreeStoneRedD extends BasicAutonEx {
         //robot.setHeading(0, this);
 
         // adjusting drop point to allow alliance robot to move foundation
-        FIRST_STONE_DROP -= 35;
+        FIRST_STONE_DROP -= 36;
 
         // drop first skystone
         distanceFromFWall = (iStonePos == 0) ? 0 : getSensorValue(robot.sensorTimeOfFlightF, INCH); // sometimes sensor reads distance through the glass in the right most postion

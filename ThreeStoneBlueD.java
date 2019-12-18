@@ -31,6 +31,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import java.util.Locale;
+
 import static org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit.INCH;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.FORWARD;
 import static org.firstinspires.ftc.teamcode.CompetitionHardware.Direction.REVERSE;
@@ -124,7 +126,7 @@ public class ThreeStoneBlueD extends BasicAutonEx {
         //robot.setHeading(0, this);
 
         // adjusting drop point to allow alliance robot to move foundation
-        FIRST_STONE_DROP -= 35;
+        FIRST_STONE_DROP -= 36;
 
         // drop first skystone
         distanceFromBWall = (iStonePos == 0) ? 0 : getSensorValue(robot.sensorTimeOfFlightB, INCH); // sometimes sensor reads distance through the glass in the right most postion
@@ -180,7 +182,7 @@ public class ThreeStoneBlueD extends BasicAutonEx {
 
         // grab 2nd skystone
         pickUpSkyStone(true);
-        telemetry.log().add("2nd stone collected: " + String.format("%.1f", opmodeRunTime.seconds()));
+        telemetry.log().add("2nd stone collected: " + String.format(Locale.getDefault(), "%.1f", opmodeRunTime.seconds()));
         telemetry.update();
 
         // correct heading

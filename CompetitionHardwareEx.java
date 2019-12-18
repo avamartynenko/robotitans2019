@@ -15,10 +15,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.openftc.revextensions2.ExpansionHubEx;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.hardware.LynxOptimizedI2cFactory;
 
 import java.util.Iterator;
@@ -42,7 +43,6 @@ public class CompetitionHardwareEx extends CompetitionHardware {
     protected DistanceSensor sensorRangeB;
     protected DistanceSensor sensorRangeL;
     protected DistanceSensor sensorRangeR;
-
     // you can also cast this to a Rev2mDistanceSensor if you want to use added
     // methods associated with the Rev2mDistanceSensor class.
     public Rev2mDistanceSensor sensorTimeOfFlightL;
@@ -53,11 +53,11 @@ public class CompetitionHardwareEx extends CompetitionHardware {
 /*    public ExpansionHubMotor backLeft;
     public ExpansionHubMotor backRight;
     public ExpansionHubMotor frontRight;
-    public ExpansionHubMotor frontLeft;
+    public ExpansionHubMotor frontLeft;*/
 
     protected ExpansionHubEx revMaster;
     protected ExpansionHubEx revSlave;
-    protected RevBulkData revExpansionMasterBulkData;
+/*    protected RevBulkData revExpansionMasterBulkData;
     protected RevBulkData revExpansionSlaveBulkData;
 
     private ArrayList<RevMotor> allMotors = new ArrayList<>();*/
