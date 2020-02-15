@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
@@ -51,28 +52,54 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  */
 
 @TeleOp(name="TeleopSylerOnlyWheels", group="Pushbot")
-@Disabled
+//@Disabled
 public class TeleopSylerOnlyWheels extends LinearOpMode {
 
     /* Declare OpMode members. */
-    CompetitionHardware robot           = new CompetitionHardware();   // Use a Pushbot's hardware
+    //CompetitionHardware robot           = new CompetitionHardware();   // Use a Pushbot's hardware
+
+    public DcMotor frontRight = null;
+    public DcMotor frontLeft = null;
+    public DcMotor backLeft = null;
+    public DcMotor backRight = null;
+
+
+    public void setPower4WDrive(double BleftDriveSpeed, double BrightDriveSpeed, double FleftDriveSpeed, double FrightDriveSpeed ){
+        backLeft.setPower(BleftDriveSpeed*BleftDriveSpeed);
+        backRight.setPower(BrightDriveSpeed*BrightDriveSpeed);
+        frontLeft.setPower(-FleftDriveSpeed*FleftDriveSpeed);
+        frontRight.setPower(-FrightDriveSpeed*FrightDriveSpeed);
+    }
+
 
     @Override
     public void runOpMode() {
+        /*
         double left;
         double right;
         double drive;
         double turn;
         double max;
 
+         */
+
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+
+
+
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
-        robot.init(hardwareMap, false, false, false);
+        //robot.init(hardwareMap, false, false, false);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Say", "Hello Driver");    //
         telemetry.update();
+
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -81,14 +108,14 @@ public class TeleopSylerOnlyWheels extends LinearOpMode {
         while (opModeIsActive()) {
 
           // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
-        robot.setPower4WDrive(gamepad1.left_stick_y,gamepad1.right_stick_y, gamepad1.left_stick_y, gamepad1.right_stick_y );
+        setPower4WDrive(gamepad1.left_stick_y,gamepad1.right_stick_y, gamepad1.left_stick_y, gamepad1.right_stick_y );
 
         if (gamepad1.right_trigger > 0){
 
             telemetry.addData("Right trigger pressed.", gamepad1.right_trigger);
 
             // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
-            robot.setPower4WDrive(gamepad1.right_trigger, -gamepad1.right_trigger, -gamepad1.right_trigger, gamepad1.right_trigger );
+            setPower4WDrive(gamepad1.right_trigger, -gamepad1.right_trigger, -gamepad1.right_trigger, gamepad1.right_trigger );
 
 
         }
@@ -97,7 +124,7 @@ public class TeleopSylerOnlyWheels extends LinearOpMode {
             telemetry.addData("Left trigger pressed.", gamepad1.left_trigger);
 
             // BleftDriveSpeed,  BrightDriveSpeed,  FleftDriveSpeed,  FrightDriveSpeed
-            robot.setPower4WDrive(-gamepad1.left_trigger, gamepad1.left_trigger, gamepad1.left_trigger, -gamepad1.left_trigger);
+             setPower4WDrive(-gamepad1.left_trigger, gamepad1.left_trigger, gamepad1.left_trigger, -gamepad1.left_trigger);
 
         }
 
