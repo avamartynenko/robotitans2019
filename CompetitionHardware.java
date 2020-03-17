@@ -97,6 +97,7 @@ public class CompetitionHardware
     public ColorSensor colorsense = null;
     private boolean hasHook = true;
     private boolean hasArm = true;
+    private boolean hasFrogTongue = true;
     public boolean activateSpeedProfile = false;
     public Hooks hookLatch = null;
     //public ServoHooks hookLatch = null;
@@ -104,6 +105,8 @@ public class CompetitionHardware
     public LiftMech liftMech = null;
     public Arm frontArm = null;
     public Arm backArm = null;
+    public FrogTongue frogTongue = null;
+
 
     public static final double     COUNTS_PER_MOTOR_REV    = 2240 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 0.66 ;     // This is < 1.0 if geared UP
@@ -177,6 +180,8 @@ public class CompetitionHardware
         if (hasHook) hookLatch = new Hooks(hwMap);
         if (hasArm) frontArm = new Arm(hwMap,Arm.FRONT_ARM);
         if (hasArm) backArm = new Arm(hwMap, Arm.BACK_ARM);
+        if (hasFrogTongue) frogTongue = new FrogTongue(hwMap);
+
 
         //Sets direction of motors
         backLeft.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors

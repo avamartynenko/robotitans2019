@@ -155,6 +155,23 @@ public class SkylerTwoHubsTeleop extends LinearOpMode {
 
             }
 
+            if(gamepad1.y){
+
+                robot.frogTongue.setPower(1);
+
+            }
+            else if(gamepad1.a){
+
+                robot.frogTongue.setPower(-1);
+
+            }
+            else {
+
+                robot.frogTongue.setPower(0);
+
+            }
+
+
             //gamepad 1 ends here
 
             //gamepad 2 starts here
